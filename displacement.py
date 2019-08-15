@@ -18,16 +18,27 @@ from scipy.interpolate import griddata
 #LIST_DIR = ['arm0_small_interface', 'arm1', 'arm2', 'arm3', 'arm4', 'arm5']
 #system_dims = np.empty((70,4))
 
-#ref_geom_name = input('Please enter the name of the file to read the reference data: \n')
+ref_geom_dir = input('Please enter the directory to read the reference data: \n')
 
-#input_geom_name = input('Please enter the name of the file to read the input data: \n')
+input_geom_dir = input('Please enter the directory to read the input data: \n')
 
-#output_file_name = input('Please enter the name of the output file (in ".txt" format): \n')
+outfile_name = input('Please enter the name of the output file: \n')
+print('\nThe output file "disp_{}" will be stored in the "disp_files" directory.\n'.format(outfile_name))
 
-os.mkdir('disp_files')
+try:
+    os.mkdir('disp_files')
+except:
+    print('The directory "disp_files" exists. I will continue with calculating the displacement. \n')
+    pass
 
-ref_geom_name = sisl.io.siesta.xvSileSiesta('MoS2.XV')
-input_geom_name = sisl.io.siesta.xvSileSiesta('SZP/MoS2.XV')
+if ref_geom_dir == input_geom_dir:
+    fdfreference = input('Please enter the name of the fdf input device geometry: ')
+    ref_geom_name = sisl.io.siesta.fdfSileSiesta('{}/{}'.format(ref_geom_dir,fdfreference))
+    input_geom_name = sisl.io.siesta.xvSileSiesta('{}/MoS2.XV'.format(input_geom_dir))
+else:
+    print('Just be careful that reference geometry will be read from "MoS2.XV" file.')
+    ref_geom_name = sisl.io.siesta.xvSileSiesta('{}/MoS2.XV'.format(ref_geom_dir))
+    input_geom_name = sisl.io.siesta.xvSileSiesta('{}/MoS2.XV'.format(input_geom_dir))
 
 fh_ref_geom = sisl.io.siesta.fdfSileSiesta('disp_files/ref_geom.fdf', 'w')
 fh_ref_geom.write_geometry(ref_geom_name.read_geometry())
@@ -37,7 +48,8 @@ fh_input_geom.write_geometry(input_geom_name.read_geometry())
 ref_geom = 'disp_files/ref_geom.fdf'
 inp_geom = 'disp_files/inp_geom.fdf'
 
-output_file_name = 'disp_files/test_disp.txt'
+#test = 'test'
+output_file_name = 'disp_files/disp_{}.txt'.format(outfile_name)
 
 # Read in the number of atoms.
 with open('disp_files/ref_geom.fdf', 'r') as fh_NoAtoms:
@@ -47,14 +59,15 @@ with open('disp_files/ref_geom.fdf', 'r') as fh_NoAtoms:
             line_NoAtoms = (line.rstrip()).split()
             NoAtoms = int(line_NoAtoms[1])
 
-# read and store the index of the first element in files of the initial and final geometry
+# Just check if the outfile exists in the target directory.
 my_file = Path("{}".format(output_file_name))
 if my_file.exists():
-    print(my_file.exists())
-    exit()
-## Open the reference and the input files.
-#fh_ref_geom = open(, 'r')
-#fh_input_geom = open(, 'r')
+    print('\n{}'.format(my_file.exists()))
+    yesno = input('The output file exists. Do you want to continue? (Y/N) \n')
+    if yesno == 'Y' or yesno == 'y':
+        print('Okay. Then I will continue!')
+    elif yesno == 'N' or yesno == 'n':
+        exit()
 
 # Read in the index number where the reference geometry starts in the input file.
 idx_ref_geom = 0
@@ -104,10 +117,13 @@ for atom_idx in range(0, NoAtoms):
 np.savetxt('{}'.format(output_file_name), system_dims);
 #print('The atomic displacements for the {} input are calculated and stored in {}.'.format(input_geom_name, output_file_name))
 
-# Start plotting the displacement map.
-os.chdir('disp_files')
 
-x, y, z, disp = np.loadtxt('test_disp.txt', unpack=True)
+# ************* Later on I will put this par in a function to call in an arbitrary position inside the code. **************
+# Start plotting the displacement map. 
+os.chdir('disp_files')
+print(os.listdir('./'))
+
+x, y, z, disp = np.loadtxt('../{}'.format(output_file_name), unpack=True)
 
 XZ = np.vstack((x,z)).T
  
@@ -115,12 +131,10 @@ print(min(x),max(x))
 print(min(z),max(z))
 #print(disp)
 
-
 #Lx = 5.50099000
 #Lz = 98.45600000
 
 xgrid, zgrid = np.mgrid[0.43:5.51, 0.74:98.46]
-
 
 grid_z0 = griddata(XZ, disp, (xgrid, zgrid), method='nearest', rescale=True)
 grid_z1 = griddata(XZ, disp, (xgrid, zgrid), method='linear', rescale=True)
@@ -129,7 +143,6 @@ grid_z1 = griddata(XZ, disp, (xgrid, zgrid), method='linear', rescale=True)
 #print(np.shape(grid_z0), grid_z0)
 #print(np.shape(grid_z1), grid_z1)
 #print(np.shape(grid_z2), grid_z2)
-
 
 plt.figure(figsize=(2,6))
 
