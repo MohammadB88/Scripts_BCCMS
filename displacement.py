@@ -23,7 +23,7 @@ ref_geom_dir = input('Please enter the directory to read the reference data: \n'
 input_geom_dir = input('Please enter the directory to read the input data: \n')
 
 outfile_name = input('Please enter the name of the output file: \n')
-print('\nThe output file "disp_{}" will be stored in the "disp_files" directory.\n'.format(outfile_name))
+print('\nThe output file "disp_{}.txt" will be stored in the "disp_files" directory.\n'.format(outfile_name))
 
 try:
     os.mkdir('disp_files')
@@ -40,19 +40,19 @@ else:
     ref_geom_name = sisl.io.siesta.xvSileSiesta('{}/MoS2.XV'.format(ref_geom_dir))
     input_geom_name = sisl.io.siesta.xvSileSiesta('{}/MoS2.XV'.format(input_geom_dir))
 
-fh_ref_geom = sisl.io.siesta.fdfSileSiesta('disp_files/ref_geom.fdf', 'w')
+fh_ref_geom = sisl.io.siesta.fdfSileSiesta('disp_files/ref_geom_{}.fdf'.format(outfile_name), 'w')
 fh_ref_geom.write_geometry(ref_geom_name.read_geometry())
-fh_input_geom = sisl.io.siesta.fdfSileSiesta('disp_files/inp_geom.fdf', 'w')
+fh_input_geom = sisl.io.siesta.fdfSileSiesta('disp_files/inp_geom_{}.fdf'.format(outfile_name), 'w')
 fh_input_geom.write_geometry(input_geom_name.read_geometry())
 
-ref_geom = 'disp_files/ref_geom.fdf'
-inp_geom = 'disp_files/inp_geom.fdf'
+ref_geom = 'disp_files/ref_geom_{}.fdf'.format(outfile_name)
+inp_geom = 'disp_files/inp_geom_{}.fdf'.format(outfile_name)
 
 #test = 'test'
 output_file_name = 'disp_files/disp_{}.txt'.format(outfile_name)
 
 # Read in the number of atoms.
-with open('disp_files/ref_geom.fdf', 'r') as fh_NoAtoms:
+with open('{}'.format(ref_geom), 'r') as fh_NoAtoms:
     for line in fh_NoAtoms:
         if 'NumberOfAtoms' in line:
             # line_NoAtoms is the line where the Number Of Atoms is written.
