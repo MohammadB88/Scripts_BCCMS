@@ -20,9 +20,19 @@ pi_value = constants.pi # value of pi constant
 mu_r = 2.0*(10**(-5)) # relative magnetic susceptibilit (PRL110,247201 (2013))
 epsilon_r = 15.2 # relative electric constant (experimental from PRB91, 125304 (2015) and PRB3, 4286 (1971))
 epsilon = 1 # dielectric constant (for simplicity let's assume it is in vacuum)
+
 distance_phsource = 5*(10**(-9)) # distance from light source to the monolayer surface 
-area_phproj = 8*(10**(-18)) # area on which the light is shined.
+# reading the coordinates of the atoms at the device's boundary
+geom_fh = sisl.io.siesta.xvSileSiesta('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.XV')
+geom = geom_fh.read_geometry(species_Z=True)
+x_beg = geom[183][0]
+z_beg = geom[180][2]
+x_end = geom[182][0]
+z_end = geom[377][2]
+print('These are the device boundaries: \n x_beg:{}, x_end:{}, z_beg:{}, z_end:{}'.format(x_beg,z_beg,x_end,z_end)) # these coordinates are in Angstrom
+area_phproj = ((x_end-x_beg)*(z_end-z_beg))*(10**(-20)) # area on which the light is shined.
 V = distance_phsource * area_phproj # the volume in which light propagates from source to the monolayer surface under the projected light.
+
 h_bar = constants.value('Planck constant in eV s')/(2*pi_value) # the Planck constant devided by 2*pi
 E_gap = 1.7 # energy gap calculated for 2H-phase of MoS2 monolayer (from Transmission or DOS outputs)
 omega = E_gap / h_bar# the frequency of the light (for simplicity let's consider it equal to E_gap = = h_bar * omega)
@@ -52,8 +62,8 @@ H_0 = sisl.Hamiltonian.read('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface
 print([200 -- 300])
 print(H_0[3,4])
 print(H_0.geometry.a2o(0, True))
-print(H_0.geometry.a2o(227, True))
-print(9*227)
+print(H_0.geometry.a2o(197, True))
+print(9*197)
 print(H_0.geometry.a2o(2250, True))
 
 # just to see if everything is working
