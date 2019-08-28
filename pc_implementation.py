@@ -11,7 +11,8 @@ Created on Mon Aug 26 11:54:29 2019
 import sisl
 import math
 import numpy as np
-from scipy import constants
+from scipy import constants, sparse, io
+
 
 # Assign the constant variables
 c = constants.value('speed of light in vacuum')
@@ -61,39 +62,44 @@ for ai in range(0,198): # ai atom index
        orbital_coordinate[new_i,0] = H_0.geometry.a2o(0, True)[oi]
        orbital_coordinate[new_i,1] = geom[180+ai,2]
        new_i = new_i + 1 # I need this so that these loops iterates and write all the atoms and their coordinate correctly.
-#
+       
 #print(orbital_coordinate)
 #print(geom[180+197,2])
 
-atom_distance = np.zeros((198,9*198))
-for ai in range(0,198): 
-   for oi in range(0,9*198):
-       atom_distance[ai,oi] = geom[180+ai,2] - orbital_coordinate[oi,1] # z_m - z_l 
+atom_distance = np.zeros((198*9,198*9))
+for oi1 in range(0,198*9): 
+   for oi2 in range(0,198*9):
+       atom_distance[oi1,oi2] = orbital_coordinate[oi1,1] - orbital_coordinate[oi2,1] # z_m - z_l 
 
+print(np.shape(atom_distance))
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 AdaggerA = 1 # to just see if the code works
 
 
 # read in and assign the device density matrix using sisl (let's just try it out)
-#DM = sisl.physics.DensityMatrix.read('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
 fdf = sisl.get_sile('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
 DM = fdf.read_density_matrix(order=['TSDE'])
-print(DM)
-print(DM[0,1])
+#print(DM)
+#print(DM[0,1])
 print(np.shape(DM))
 M = DM.copy() # M stores the mulliken charges
+print(np.abs(M._csr._D[:, -1]).sum())
 M._csr._D[:,:] += DM._csr._D[:,-1].reshape(-1,1)
-print(M._csr._D[:,:])
-print(np.shape(M._csr._D[:,:]))
-print((DM._csr._D[:,-1].reshape(-1,1))[10,0])
+#print(M._csr._D[:,:])
+#print(np.shape(M._csr._D[:,:]))
+#print((DM._csr._D[:,-1].reshape(-1,1))[10,0])
+
+#io.mmwrite('test.txt', M)
+    
 #M._csr._D[:,:] = np.multiply(M._csr._D[:,:], DM._csr._D[:,-1].reshape(-1,1))
 
-print(np.shape(M))
-for i in range(1):
-    for j in range(50):
-        if M[i,j].any() != 0:
+#print(np.shape(M))
+for i in range(10):
+    for j in range(10):
+        if M[i,j][0] > 0.5:
             print(M[i,j])
-print(M)
+
+#print(M)
 
 #print(H_0[3,4])
 #print(H_0.geometry.a2o(0, True))
@@ -106,10 +112,21 @@ z_m = 10
 z_l = 5
 
 print(H_0)
-print(H_0[1,1,1])
+print(H_0[180*9+1,180*9+1,0])
 print(np.shape(H_0))
+
+H_0_lm = np.zeros((198*9,198*9,2))
+for l in range(0,198*9):
+    for m in range(0,198*9):
+        H_0_lm[l,m] = H_0[180*9+l,180*9+m]
+
+print(H_0_lm)
+print(H_0_lm[1,1,0])
+print(np.shape(H_0_lm))
+
 # perturbation Hamiltonian
 H_perturbation = np.zeros(np.shape(H_0))
-H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
+#H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
+H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance.dot(H_0_lm[:,:,0]) * (AdaggerA) # atom_distance = (z_m - z_l)
 
-#print(H_perturbation)
+print(H_perturbation)
