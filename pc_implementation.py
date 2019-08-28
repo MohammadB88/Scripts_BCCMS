@@ -66,39 +66,40 @@ for ai in range(0,198): # ai atom index
 #print(orbital_coordinate)
 #print(geom[180+197,2])
 
-atom_distance = np.zeros((198*9,198*9))
+atom_distance = np.zeros((198*9,198*9,2))
 for oi1 in range(0,198*9): 
    for oi2 in range(0,198*9):
        atom_distance[oi1,oi2] = orbital_coordinate[oi1,1] - orbital_coordinate[oi2,1] # z_m - z_l 
 
-print(np.shape(atom_distance))
-# it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
-AdaggerA = 1 # to just see if the code works
-
+print('atom_distance shape: {} '.format(np.shape(atom_distance)))
 
 # read in and assign the device density matrix using sisl (let's just try it out)
 fdf = sisl.get_sile('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
 DM = fdf.read_density_matrix(order=['TSDE'])
 #print(DM)
 #print(DM[0,1])
-print(np.shape(DM))
+print('DM shape: {}'.format(np.shape(DM)))
 M = DM.copy() # M stores the mulliken charges
 print(np.abs(M._csr._D[:, -1]).sum())
-M._csr._D[:,:] += DM._csr._D[:,-1].reshape(-1,1)
-#print(M._csr._D[:,:])
-#print(np.shape(M._csr._D[:,:]))
-#print((DM._csr._D[:,-1].reshape(-1,1))[10,0])
+M._csr._D[:,:] *= DM._csr._D[:,-1].reshape(-1,1)
 
 #io.mmwrite('test.txt', M)
     
 #M._csr._D[:,:] = np.multiply(M._csr._D[:,:], DM._csr._D[:,-1].reshape(-1,1))
 
 #print(np.shape(M))
-for i in range(10):
-    for j in range(10):
-        if M[i,j][0] > 0.5:
-            print(M[i,j])
+#for i in range(10):
+    #for j in range(10):
+        #if DM[i,j][0][0] > 0.5:
+            #print(DM[i,j]- M[i,j])
 
+#print(M)
+#k = 0 
+#for i in range(5022):
+    #for j in range(5022):
+        #if M[i,j][0][0] > 0.7:
+            #k += 1
+#print(k) # There Are 2418 terms with M[i,j][0][0] > 0.5
 #print(M)
 
 #print(H_0[3,4])
@@ -111,22 +112,55 @@ for i in range(10):
 z_m = 10
 z_l = 5
 
-print(H_0)
+#print(H_0)
 print(H_0[180*9+1,180*9+1,0])
 print(np.shape(H_0))
 
+#try:
+    #H_0_lm = np.loadtxt('H_0_lm.dat')
+#except:
 H_0_lm = np.zeros((198*9,198*9,2))
 for l in range(0,198*9):
     for m in range(0,198*9):
         H_0_lm[l,m] = H_0[180*9+l,180*9+m]
 
-print(H_0_lm)
+np.save('H_0_lm.dat.txt', H_0_lm)
+    
+#print(H_0_lm)
 print(H_0_lm[1,1,0])
 print(np.shape(H_0_lm))
 
+# it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
+#AdaggerA = 1 # to just see if the code works
+AdaggerA = np.zeros((198*9,198*9,2))
+k = 0 
+for i in range(180*9,180*9+198*9):
+    for j in range(180*9,180*9+198*9):
+        if M[i,j][0][0] > 0.7:
+            AdaggerA[i-180*9,j-180*9] = 1  # there is possibility "one" for transition from orbital "m" to orbital "l"
+            k +=1
+        else:
+            AdaggerA[i-180*9,j-180*9] = 0  # there is possibility "zero" for transition from orbital "m" to orbital "l"
+
+print('There are {} number of orbitals with Mulliken charge of greater than 0.7. '.format(k))
+
 # perturbation Hamiltonian
 H_perturbation = np.zeros(np.shape(H_0))
+print(np.shape(H_perturbation))
+H_perturbation_device = np.zeros((198*9,198*9,2))
+print('H_perturbation shape before assignment: {}'.format(np.shape(H_perturbation_device)))
+#print(H_perturbation_device)
 #H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
-H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance.dot(H_0_lm[:,:,0]) * (AdaggerA) # atom_distance = (z_m - z_l)
+H_perturbation_device = ((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * np.multiply(np.multiply(atom_distance,H_0_lm),AdaggerA) # atom_distance = (z_m - z_l)
 
-print(H_perturbation)
+#print(H_perturbation_device)
+print('H_perturbation shape after assignment: {}'.format(np.shape(H_perturbation_device)))
+H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,:] = H_perturbation_device[:,:,:]
+print(H_perturbation[200*9,200*9,:])
+zero = 0
+for i in range(180*9,180*9+198*9):
+    for j in range(180*9,180*9+198*9):
+        if H_perturbation[i,j].any() > 0.0:
+            zero += 1
+            
+print('There are {} number of non-zero elements in the H_perturbation. '.format(zero))
