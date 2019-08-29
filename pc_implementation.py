@@ -70,30 +70,41 @@ print('The sum of absolute value of overlap terms is equal to {}. '.format(np.ab
 print('***** If the above number in complex Hamiltonians as SIESTA\'s is ZERO, something is wrong!!!! *****\n') # Later on I will put a try: ... except ... to control this term.
 M._csr._D[:,:] *= DM._csr._D[:,-1].reshape(-1,1)
 
+#for i in range(180*9,180*9+5):
+    #for j in range(180*9,180*9+5):
+        #print(i, j, M[i,j])
+            
 #print(M)
-tmp = 0 
+tmp_nonzero = 0 
+tmp_zero = 0 
 threshold = 0.5 # amount of Mulliken charge to consider an orbital occupied.
+nonzero_idx = []
 for i in range(180*9,180*9+198*9):
     for j in range(180*9,180*9+198*9):
-        if M[i,j][0][0] > threshold:
-            tmp += 1
-print('This is just a test to make sure the Mulliken charges are correctly read.\n There are {} number of terms with M[i,j][0][0] > {}. \n'.format(tmp,threshold)) 
+        if M[i,j][0][0] >= threshold:
+            tmp_nonzero += 1
+            nonzero_idx.append((i,j))
+        else:
+            tmp_zero += 1
+print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively. \n'.format(tmp_nonzero, tmp_zero, threshold, threshold)) 
+print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(nonzero_idx[:10]))
 
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
-nonzero_i = 0
-nonzero_j = 0
+beginforloop = time.time()
+#nonzero_i = 0
+#nonzero_j = 0
 AdaggerA = np.zeros((198*9,198*9,1))
-for i in range(180*9,180*9+198*9):
-    for j in range(180*9,180*9+198*9):
-        if M[i,j][0][0] > threshold:
-            nonzero_i, nonzero_j = i,j
-            AdaggerA[i-180*9,j-180*9] = 1  # there is possibility "one" for transition from orbital "m" to orbital "l"
+for l in range(180*9,180*9+198*9):
+    for m in range(180*9,180*9+198*9):
+        if (l,m) in nonzero_idx: # M[m,l][0][0] < threshold
+            AdaggerA[l-180*9,m-180*9] = 0  # there is possibility "one" for transition from orbital "m" to orbital "l"
         else:
-            AdaggerA[i-180*9,j-180*9] = 0  # there is possibility "zero" for transition from orbital "m" to orbital "l"
-
+            AdaggerA[l-180*9,m-180*9] = 1  # there is possibility "zero" for transition from orbital "m" to orbital "l"
+endforloop = time.time()
+print('TIME for the for loop: {}'.format(endforloop-beginforloop))
 AdaggerA_nonzero_elm = np.count_nonzero(np.count_nonzero(AdaggerA, axis=2))
-print('There are {} number of orbitals with Mulliken charge > {}.  '.format(AdaggerA_nonzero_elm,threshold))
+print('There are {} number of nonzero elements in matrix AdaggerA. '.format(AdaggerA_nonzero_elm,threshold))
 
 # HAMILTONIAN  
 #
@@ -117,7 +128,7 @@ for l in range(0,198*9):
         H_0_lm[l,m] = H_0[180*9+l,180*9+m,0]
 
 #print(H_0_lm)
-print(H_0_lm[0,0,0])
+print('It tests if the script correctly read the H_0 in the device region: {}.'.format(H_0_lm[0,0,0]))
 print('H_0_lm shape: {}'.format(np.shape(H_0_lm)))
 H_0_lm_nonzero_elm = np.count_nonzero(np.count_nonzero(H_0_lm, axis=2))
 print('There are {} nonzero elements in matrix H_0_lm. '.format(H_0_lm_nonzero_elm))
@@ -166,12 +177,12 @@ for l in range(0,198*9):
         #print(AdaggerA[l,m,0])
         #print(H_perturbation_device[l,m,0])
 
-l = 0
-m = 0
-l = nonzero_i
-m = nonzero_j
-print(l,m)
-print(((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0])
+#l = 0
+#m = 0
+#l = nonzero_i
+#m = nonzero_j
+#print(l,m)
+#print(((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0])
 
 print('\n***** I may have to devide this perturbation by "2" because <l|H_pertb|m> = <m|H_pertb|l>. *****')
 
@@ -182,10 +193,24 @@ H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_de
 print('There are {} number of non-zero elements in the H_perturbation_device. '.format(H_pertb_device_nonzero_elm))
 
 H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0]
-print(H_perturbation[200*9,200*9,:])
+print(nonzero_idx[0][0], nonzero_idx[0][1], H_perturbation[nonzero_idx[0][0],nonzero_idx[0][1],:])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
+
+print(H_perturbation)
+
+# ATOM_DISTANCE (z_m - z_l)
+#
+# write the H_perturbation into a Sparse Matrix and then to a .nc file using sisl
+dH = sisl.get_sile('deltaH.dH.nc', 'w')
+print(sparse.csr_matrix(H_perturbation))
+#print(sisl.SparseCSR(H_perturbation))
+final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
+final_H_pertb = sisl.SparseCSR(H_perturbation)
+print(final_H_pertb)
+
+dH.write_delta(final_H_pertb)
 
 time_end = time.time()
 
