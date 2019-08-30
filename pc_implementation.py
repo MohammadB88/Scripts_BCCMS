@@ -33,7 +33,7 @@ x_beg = geom[183,0]
 z_beg = geom[180,2]
 x_end = geom[182,0]
 z_end = geom[377,2]
-print(geom)
+#print(geom)
 print('These are the device boundaries: \n x_beg:{}, x_end:{}, z_beg:{}, z_end:{}'.format(x_beg,z_beg,x_end,z_end)) # these coordinates are in Angstrom
 area_phproj = ((x_end-x_beg)*(z_end-z_beg))*(10**(-20)) # area on which the light is shined.
 V = distance_phsource * area_phproj # the volume in which light propagates from source to the monolayer surface under the projected light.
@@ -48,12 +48,12 @@ print('h_bar is equal to {}. '.format(h_bar))
 
 # the photon flux is defined as the number of photons per unit time per unit area
 I_omega = (N * c)/(V * math.sqrt(mu_r * epsilon_r))
-print('Photon flux is equal to {}. '.format(I_omega))
+print('Photon flux is equal to {} N/m^2.s. '.format(I_omega))
 
 # the photon intensity is defined as !!!!!??????
 lambda_value = 10*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm)
 Intensity = I_omega * (h * c)/(lambda_value)
-print('Photon intensity is equal to {}. '.format(Intensity))
+print('Photon intensity is equal to {} . '.format(Intensity))
 
 # DENSITY MATRIX
 #
@@ -92,8 +92,6 @@ print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(non
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
 beginforloop = time.time()
-#nonzero_i = 0
-#nonzero_j = 0
 AdaggerA = np.zeros((198*9,198*9,1))
 for l in range(180*9,180*9+198*9):
     for m in range(180*9,180*9+198*9):
@@ -163,7 +161,7 @@ atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axi
 print('There are {} nonzero elements in matrix atom_distance. '.format(atom_distance_nonzero_elm))
 
 # perturbation Hamiltonian
-H_perturbation = np.zeros(np.shape(H_0))
+H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1))
 print(np.shape(H_perturbation))
 H_perturbation_device = np.zeros((198*9,198*9,1))
 print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_perturbation_device)))
@@ -177,13 +175,6 @@ for l in range(0,198*9):
         #print(AdaggerA[l,m,0])
         #print(H_perturbation_device[l,m,0])
 
-#l = 0
-#m = 0
-#l = nonzero_i
-#m = nonzero_j
-#print(l,m)
-#print(((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0])
-
 print('\n***** I may have to devide this perturbation by "2" because <l|H_pertb|m> = <m|H_pertb|l>. *****')
 
 #print(H_perturbation_device)
@@ -193,26 +184,40 @@ H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_de
 print('There are {} number of non-zero elements in the H_perturbation_device. '.format(H_pertb_device_nonzero_elm))
 
 H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0]
-print(nonzero_idx[0][0], nonzero_idx[0][1], H_perturbation[nonzero_idx[0][0],nonzero_idx[0][1],:])
+print(nonzero_idx[500][0], nonzero_idx[500][1], H_perturbation[nonzero_idx[500][0],nonzero_idx[500][1],:])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
 
-print(H_perturbation)
+#print(H_perturbation)
 
 # ATOM_DISTANCE (z_m - z_l)
 #
 # write the H_perturbation into a Sparse Matrix and then to a .nc file using sisl
 dH = sisl.get_sile('deltaH.dH.nc', 'w')
-print(sparse.csr_matrix(H_perturbation))
-#print(sisl.SparseCSR(H_perturbation))
 final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
-final_H_pertb = sisl.SparseCSR(H_perturbation)
+beg_final_assign = time.time()
+print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
+#final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
+test_csr = sparse.csr_matrix(H_perturbation[:,:,0])
+#print(test_csr)
+#print(H_perturbation[:,:][0])
+print(np.shape(final_H_pertb))
+final_H_pertb.fromsp(test_csr)
+#for l in range(0,180*9+198*9+180*9):
+#    for m in range(0,(180*9+198*9+180*9)*9):
+#        final_H_pertb[l,m,0] = H_perturbation[l,m,0]
+#        if m%(180*9+198*9+180*9) == 0 :
+#            print('it is working!')
+            
+#final_H_pertb[:,:] = H_perturbation[:,:]
+end_final_assign = time.time()
+print('Total time for the final assignment of the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
 print(final_H_pertb)
 
 dH.write_delta(final_H_pertb)
 
 time_end = time.time()
 
-print('It takes {} for this script to calcualte the H_perturbation.'.format(time_end - time_begin))
+print('It takes {} for this script to calcualte, assign, and write the H_perturbation to an external .nc file.'.format(time_end - time_begin))
 
