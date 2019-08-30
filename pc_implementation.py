@@ -70,8 +70,8 @@ print('The sum of absolute value of overlap terms is equal to {}. '.format(np.ab
 print('***** If the above number in complex Hamiltonians as SIESTA\'s is ZERO, something is wrong!!!! *****\n') # Later on I will put a try: ... except ... to control this term.
 M._csr._D[:,:] *= DM._csr._D[:,-1].reshape(-1,1)
 
-#for i in range(180*9,180*9+5):
-    #for j in range(180*9,180*9+5):
+#for i in range(180,180+198):
+    #for j in range(180*9,180*9+198*9):
         #print(i, j, M[i,j])
             
 #print(M)
@@ -79,21 +79,23 @@ tmp_nonzero = 0
 tmp_zero = 0 
 threshold = 0.5 # amount of Mulliken charge to consider an orbital occupied.
 nonzero_idx = []
-for i in range(180*9,180*9+198*9):
+for i in range(180,180+198):
     for j in range(180*9,180*9+198*9):
         if M[i,j][0][0] >= threshold:
             tmp_nonzero += 1
-            nonzero_idx.append((i,j))
+            nonzero_idx.append((i,j)) # These are elms of a sparse matrix -> they are aesy to access by built-in functions in module "scipy" class "sparse"
         else:
             tmp_zero += 1
-print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively. \n'.format(tmp_nonzero, tmp_zero, threshold, threshold)) 
-print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(nonzero_idx[:10]))
+
+#nonzero_mulliken = sparse.csr_matrix.count_nonzero(M)
+print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively, in the first image. \nIn total, there are {} and {}, respectively.'.format(tmp_nonzero, tmp_zero, threshold, threshold, tmp_nonzero*9*9, tmp_zero*9*9)) 
+print('\nThe first 10 indecis with nonzero Mulliken charges, in the first image, are {}. '.format(nonzero_idx[:10]))
 
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
 beginforloop = time.time()
-AdaggerA = np.zeros((198*9,198*9,1))
-for l in range(180*9,180*9+198*9):
+AdaggerA = np.zeros((198,198*9,1))
+for l in range(180,180+198):
     for m in range(180*9,180*9+198*9):
         if (l,m) in nonzero_idx: # M[m,l][0][0] < threshold
             AdaggerA[l-180*9,m-180*9] = 0  # there is possibility "one" for transition from orbital "m" to orbital "l"
