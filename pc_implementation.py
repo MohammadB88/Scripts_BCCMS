@@ -48,12 +48,12 @@ print('h_bar is equal to {}. '.format(h_bar))
 
 # the photon flux is defined as the number of photons per unit time per unit area
 I_omega = (N * c)/(V * math.sqrt(mu_r * epsilon_r))
-print('Photon flux is equal to {} N/m^2.s. '.format(I_omega))
+print('Photon flux is equal to {} N_ph/m^2.s. '.format(I_omega))
 
 # the photon intensity is defined as !!!!!??????
 lambda_value = 10*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm)
 Intensity = I_omega * (h * c)/(lambda_value)
-print('Photon intensity is equal to {} . '.format(Intensity))
+print('Photon intensity is equal to {} (N_ph/m^2.s)*(ev/s). '.format(Intensity))
 
 # DENSITY MATRIX
 #
@@ -191,33 +191,26 @@ print('There are {} number of non-zero elements in the H_perturbation. '.format(
 
 #print(H_perturbation)
 
-# ATOM_DISTANCE (z_m - z_l)
+# HAMILTONIAN ASSIGNMENT
 #
 # write the H_perturbation into a Sparse Matrix and then to a .nc file using sisl
+beg_final_assign = time.time()
 dH = sisl.get_sile('deltaH.dH.nc', 'w')
 final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
-beg_final_assign = time.time()
 print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
 #final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
 test_csr = sparse.csr_matrix(H_perturbation[:,:,0])
-#print(test_csr)
+print(sparse.csr_matrix.count_nonzero(test_csr))
 #print(H_perturbation[:,:][0])
 print(np.shape(final_H_pertb))
-final_H_pertb.fromsp(test_csr)
-#for l in range(0,180*9+198*9+180*9):
-#    for m in range(0,(180*9+198*9+180*9)*9):
-#        final_H_pertb[l,m,0] = H_perturbation[l,m,0]
-#        if m%(180*9+198*9+180*9) == 0 :
-#            print('it is working!')
-            
-#final_H_pertb[:,:] = H_perturbation[:,:]
+final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
 end_final_assign = time.time()
-print('Total time for the final assignment of the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
-print(final_H_pertb)
 
+print('Total time for the final assignment of the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
+
+print(final_H_pertb)
 dH.write_delta(final_H_pertb)
 
 time_end = time.time()
 
 print('It takes {} for this script to calcualte, assign, and write the H_perturbation to an external .nc file.'.format(time_end - time_begin))
-
