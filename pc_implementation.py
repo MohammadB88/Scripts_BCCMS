@@ -98,14 +98,14 @@ for k in range(1620,1630):
 print(np.count_nonzero(adagger_l), len(adagger_l), adagger_l[:10])
 #nonzero_mulliken = sparse.csr_matrix.count_nonzero(M)
 print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively, in the first image. \n'.format(tmp_nonzero, tmp_zero, threshold, threshold)) 
-print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format((np.where(a_m == 1))))
+#print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format((np.where(a_m == 1))))
 
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
 beginforloop = time.time()
 print('a_m:',np.shape(np.array(a_m).reshape(1,len(a_m))),'adagger_l:',np.shape(np.array(adagger_l).reshape(len(adagger_l),1)))
 adaggera_value = np.array(adagger_l).reshape(len(adagger_l),1).dot(np.array(a_m).reshape(1,len(a_m)))
-print(np.shape(adaggera_value))
+#print(np.shape(adaggera_value))
 AdaggerA = np.zeros((198*9,198*9,1))
 for l in range(180*9,180*9+198*9):
     for m in range(180*9,180*9+198*9):
@@ -205,7 +205,8 @@ print('There are {} number of non-zero elements in the H_perturbation_device. '.
 # This is only for the first image. 
 #H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0] #(-1j)*
 # I sould generalize it to include the effect of perturbation on other images.
-for n_img in range(10):
+for n_img in range(0,9):
+    print(180*9+558*9*n_img - 180*9+198*9+558*9*n_img)
     H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = H_perturbation_device[:,:,0] #(-1j)*
 
 print(180*9, 180*9, H_perturbation[180*9,180*9,:])
