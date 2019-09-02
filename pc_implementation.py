@@ -27,7 +27,7 @@ epsilon = 1 # dielectric constant (for simplicity let's assume it is in vacuum)
 
 distance_phsource = 100*(10**(-9)) # distance from light source to the monolayer surface 
 # reading the coordinates of the atoms at the device's boundary
-geom_fh = sisl.io.siesta.xvSileSiesta('sample_input/MoS2.XV')
+geom_fh = sisl.io.siesta.xvSileSiesta('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.XV')
 geom = geom_fh.read_geometry()
 x_beg = geom[183,0]
 z_beg = geom[180,2]
@@ -59,7 +59,7 @@ print('Photon intensity is equal to {} (N_ph/m^2.s)*(ev/s). '.format(Intensity))
 #
 # read in and assign the device density matrix using sisl (let's just try it out)
 print('\nStart reading in the density matrix. \n')
-fdf = sisl.get_sile('sample_input/MoS2.fdf')
+fdf = sisl.get_sile('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
 DM = fdf.read_density_matrix(order=['TSDE'])
 #print(DM)
 #print(DM[0,1])
@@ -78,32 +78,43 @@ M._csr._D[:,:] *= DM._csr._D[:,-1].reshape(-1,1)
 #print(M)
 tmp_nonzero = 0 
 tmp_zero = 0 
-threshold = 0.7 # amount of Mulliken charge to consider an orbital occupied.
-nonzero_idx = []
+threshold = 0.1 # amount of Mulliken charge to consider an orbital occupied.
+a_m = [] # occupied states = 1, unoccupied states = 0
+adagger_l = [] # occupied states = 0, unoccupied states = 1
 for i in range(180*9,180*9+198*9):
-    for j in range(180*9,180*9+198*9):
-        if M[i,j][0][0] >= threshold:
-            tmp_nonzero += 1
-            nonzero_idx.append((i,j))
-        else:
-            tmp_zero += 1
+    if M[i,i][0][0] >= threshold:
+        tmp_nonzero += 1
+        #print(M[i,i][0][0])
+        a_m.append(1)
+        adagger_l.append(0) 
+    elif M[i,i][0][0] < threshold:
+        a_m.append(0)
+        adagger_l.append(1)
+        tmp_zero += 1
 
+print(np.count_nonzero(a_m), len(a_m), a_m[0:10])
+for k in range(1620,1630):
+    print(M[k,k][0][0])
+print(np.count_nonzero(adagger_l), len(adagger_l), adagger_l[:10])
 #nonzero_mulliken = sparse.csr_matrix.count_nonzero(M)
 print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively, in the first image. \n'.format(tmp_nonzero, tmp_zero, threshold, threshold)) 
-print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(nonzero_idx[:10]))
+print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(np.where(a_m == 1)))
 
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
 beginforloop = time.time()
+adaggera_value = np.dot(np.array(adagger_l).T,np.array(a_m))
 AdaggerA = np.zeros((198*9,198*9,1))
 for l in range(180*9,180*9+198*9):
     for m in range(180*9,180*9+198*9):
-        if (l,m) in nonzero_idx: # M[m,l][0][0] < threshold
-            AdaggerA[l-180*9,m-180*9] = 0  # there is possibility "one" for transition from orbital "m" to orbital "l"
+        if np.where(adaggera_value == 1) == True: # M[m,l][0][0] < threshold
+            AdaggerA[l-180*9,m-180*9] = 1  # there is possibility "one" for transition from orbital "m" to orbital "l"
         else:
-            AdaggerA[l-180*9,m-180*9] = 1  # there is possibility "zero" for transition from orbital "m" to orbital "l"
+            AdaggerA[l-180*9,m-180*9] = 0  # there is possibility "zero" for transition from orbital "m" to orbital "l"
 endforloop = time.time()
 print('TIME for the for loop: {}'.format(endforloop-beginforloop))
+
+#print(np.shape(AdaggerA))
 AdaggerA_nonzero_elm = np.count_nonzero(np.count_nonzero(AdaggerA, axis=2))
 print('There are {} number of nonzero elements in matrix AdaggerA. '.format(AdaggerA_nonzero_elm,threshold))
 
@@ -111,9 +122,9 @@ print('There are {} number of nonzero elements in matrix AdaggerA. '.format(Adag
 #
 # read in and assign the device Hamiltonian using sisl (let's just try it out)
 print('\nStart reading in the unperturbed Hamiltonian (H_0). \n')
-H_0 = sisl.Hamiltonian.read('sample_input/MoS2.fdf')
+H_0 = sisl.Hamiltonian.read('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
 
-#print(H_0)
+print(H_0)
 print('The Hamiltonian term on the first orbital of the first atom in the device region is equal to {}.'.format(H_0[180*9+0,180*9+0,0]))
 print(np.shape(H_0))
 
@@ -123,10 +134,10 @@ print('Selecting part of the unperturbed Hamiltonian that belongs to the device 
 #except:
     #np.save('H_0_lm.dat.txt', H_0_lm)
 
-H_0_lm = np.zeros((198*9,198*9,1), dtype=np.complex64)
+H_0_lm = np.zeros((198*9,198*9,1))
 for l in range(0,198*9):
     for m in range(0,198*9):
-        H_0_lm[l,m] = (-1j)*H_0[180*9+l,180*9+m,0]
+        H_0_lm[l,m] = H_0[180*9+l,180*9+m,0]
 
 #print(H_0_lm)
 print('It tests if the script correctly read the H_0 in the device region: {}.'.format(H_0_lm[0,0,0]))
@@ -164,7 +175,7 @@ atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axi
 print('There are {} nonzero elements in matrix atom_distance. '.format(atom_distance_nonzero_elm))
 
 # perturbation Hamiltonian
-H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1))
+H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1)) #, dtype=np.complex64)
 print(np.shape(H_perturbation))
 H_perturbation_device = np.zeros((198*9,198*9,1))
 print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_perturbation_device)))
@@ -186,13 +197,13 @@ print('H_perturbation_device shape after assignment: {}'.format(np.shape(H_pertu
 H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_device, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation_device. '.format(H_pertb_device_nonzero_elm))
 
-H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = (-1)*H_perturbation_device[:,:,0]
-print(nonzero_idx[500][0], nonzero_idx[500][1], H_perturbation[nonzero_idx[500][0],nonzero_idx[500][1],:])
+H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0] #(-1j)*
+print(0, 0, H_perturbation[0,0,:])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
 
-#print(H_perturbation)
+print(np.shape(H_perturbation))
 
 # HAMILTONIAN ASSIGNMENT
 #
@@ -200,11 +211,11 @@ print('There are {} number of non-zero elements in the H_perturbation. '.format(
 beg_final_assign = time.time()
 dH = sisl.get_sile('deltaH.dH.nc', 'w')
 final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
-print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
+#print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
 #final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
 test_csr = sparse.csr_matrix(H_perturbation[:,:,0])
 print(sparse.csr_matrix.count_nonzero(test_csr))
-#print(H_perturbation[:,:][0])
+print(test_csr)
 print(np.shape(final_H_pertb))
 final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
 end_final_assign = time.time()
