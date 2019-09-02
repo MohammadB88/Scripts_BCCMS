@@ -98,25 +98,30 @@ for k in range(1620,1630):
 print(np.count_nonzero(adagger_l), len(adagger_l), adagger_l[:10])
 #nonzero_mulliken = sparse.csr_matrix.count_nonzero(M)
 print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively, in the first image. \n'.format(tmp_nonzero, tmp_zero, threshold, threshold)) 
-print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(np.where(a_m == 1)))
+print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format((np.where(a_m == 1))))
 
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
 beginforloop = time.time()
-adaggera_value = np.dot(np.array(adagger_l).T,np.array(a_m))
+print('a_m:',np.shape(np.array(a_m).reshape(1,len(a_m))),'adagger_l:',np.shape(np.array(adagger_l).reshape(len(adagger_l),1)))
+adaggera_value = np.array(adagger_l).reshape(len(adagger_l),1).dot(np.array(a_m).reshape(1,len(a_m)))
+print(np.shape(adaggera_value))
 AdaggerA = np.zeros((198*9,198*9,1))
 for l in range(180*9,180*9+198*9):
     for m in range(180*9,180*9+198*9):
-        if np.where(adaggera_value == 1) == True: # M[m,l][0][0] < threshold
-            AdaggerA[l-180*9,m-180*9] = 1  # there is possibility "one" for transition from orbital "m" to orbital "l"
+        if adaggera_value[l-180*9,m-180*9] == 1: # M[m,l][0][0] < threshold
+            AdaggerA[l-180*9,m-180*9,0] = 1  # there is possibility "one" for transition from orbital "m" to orbital "l"
         else:
-            AdaggerA[l-180*9,m-180*9] = 0  # there is possibility "zero" for transition from orbital "m" to orbital "l"
+            AdaggerA[l-180*9,m-180*9,0] = 0  # there is possibility "zero" for transition from orbital "m" to orbital "l"
 endforloop = time.time()
 print('TIME for the for loop: {}'.format(endforloop-beginforloop))
 
-#print(np.shape(AdaggerA))
+print('This is a 10x10 sample of the matrix AdaggerA to make sure it is working as expected.')
+print(np.array(AdaggerA[0:10,0:10,0].reshape(10,10)))
+
+#AdaggerA_nonzero_elm = np.count_nonzero(np.count_nonzero(AdaggerA, axis=2))
 AdaggerA_nonzero_elm = np.count_nonzero(np.count_nonzero(AdaggerA, axis=2))
-print('There are {} number of nonzero elements in matrix AdaggerA. '.format(AdaggerA_nonzero_elm,threshold))
+print('There are {} number of nonzero elements in matrix AdaggerA. '.format(AdaggerA_nonzero_elm))
 
 # HAMILTONIAN  
 #
@@ -183,7 +188,7 @@ print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_pert
 #H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
 for l in range(0,198*9):
     for m in range(0,198*9):
-        H_perturbation_device[l,m,0] = ((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * 1 # atom_distance = (z_m - z_l)
+        H_perturbation_device[l,m,0] = ((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
         #print(atom_distance[l,m,0])
         #print(H_0_lm[l,m,0])
         #print(AdaggerA[l,m,0])
@@ -197,8 +202,13 @@ print('H_perturbation_device shape after assignment: {}'.format(np.shape(H_pertu
 H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_device, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation_device. '.format(H_pertb_device_nonzero_elm))
 
-H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0] #(-1j)*
-print(0, 0, H_perturbation[0,0,:])
+# This is only for the first image. 
+#H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0] #(-1j)*
+# I sould generalize it to include the effect of perturbation on other images.
+for n_img in range(10):
+    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = H_perturbation_device[:,:,0] #(-1j)*
+
+print(180*9, 180*9, H_perturbation[180*9,180*9,:])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
