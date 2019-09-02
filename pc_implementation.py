@@ -27,7 +27,7 @@ epsilon = 1 # dielectric constant (for simplicity let's assume it is in vacuum)
 
 distance_phsource = 100*(10**(-9)) # distance from light source to the monolayer surface 
 # reading the coordinates of the atoms at the device's boundary
-geom_fh = sisl.io.siesta.xvSileSiesta('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.XV')
+geom_fh = sisl.io.siesta.xvSileSiesta('sample_input/MoS2.XV')
 geom = geom_fh.read_geometry()
 x_beg = geom[183,0]
 z_beg = geom[180,2]
@@ -59,7 +59,7 @@ print('Photon intensity is equal to {} (N_ph/m^2.s)*(ev/s). '.format(Intensity))
 #
 # read in and assign the device density matrix using sisl (let's just try it out)
 print('\nStart reading in the density matrix. \n')
-fdf = sisl.get_sile('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
+fdf = sisl.get_sile('sample_input/MoS2.fdf')
 DM = fdf.read_density_matrix(order=['TSDE'])
 #print(DM)
 #print(DM[0,1])
@@ -68,34 +68,35 @@ print('\nStart calculating Mulliken populations from the input DM.')
 M = DM.copy() # M stores the mulliken charges
 print('The sum of absolute value of overlap terms is equal to {}. '.format(np.abs(M._csr._D[:, -1]).sum()))
 print('***** If the above number in complex Hamiltonians as SIESTA\'s is ZERO, something is wrong!!!! *****\n') # Later on I will put a try: ... except ... to control this term.
+print(np.abs(M._csr._D[:, -1]).sum())
 M._csr._D[:,:] *= DM._csr._D[:,-1].reshape(-1,1)
 
-#for i in range(180,180+198):
-    #for j in range(180*9,180*9+198*9):
+#for i in range(8*9,8*9+10):
+    #for j in range(8*9,8*9+10):
         #print(i, j, M[i,j])
             
 #print(M)
 tmp_nonzero = 0 
 tmp_zero = 0 
-threshold = 0.5 # amount of Mulliken charge to consider an orbital occupied.
+threshold = 0.7 # amount of Mulliken charge to consider an orbital occupied.
 nonzero_idx = []
-for i in range(180,180+198):
+for i in range(180*9,180*9+198*9):
     for j in range(180*9,180*9+198*9):
         if M[i,j][0][0] >= threshold:
             tmp_nonzero += 1
-            nonzero_idx.append((i,j)) # These are elms of a sparse matrix -> they are aesy to access by built-in functions in module "scipy" class "sparse"
+            nonzero_idx.append((i,j))
         else:
             tmp_zero += 1
 
 #nonzero_mulliken = sparse.csr_matrix.count_nonzero(M)
-print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively, in the first image. \nIn total, there are {} and {}, respectively.'.format(tmp_nonzero, tmp_zero, threshold, threshold, tmp_nonzero*9*9, tmp_zero*9*9)) 
-print('\nThe first 10 indecis with nonzero Mulliken charges, in the first image, are {}. '.format(nonzero_idx[:10]))
+print('There are {} and {} number of terms with M[i,j][0][0] >= {} and M[i,j][0][0] < {}, respectively, in the first image. \n'.format(tmp_nonzero, tmp_zero, threshold, threshold)) 
+print('\nThe first 10 indecis with nonzero Mulliken charges are {}. '.format(nonzero_idx[:10]))
 
 # it enforces to consider only Hamiltonian elements which are representing "occupied Orbital m and unoccupied Orbital l"
 #AdaggerA = 1 # to just see if the code works
 beginforloop = time.time()
-AdaggerA = np.zeros((198,198*9,1))
-for l in range(180,180+198):
+AdaggerA = np.zeros((198*9,198*9,1))
+for l in range(180*9,180*9+198*9):
     for m in range(180*9,180*9+198*9):
         if (l,m) in nonzero_idx: # M[m,l][0][0] < threshold
             AdaggerA[l-180*9,m-180*9] = 0  # there is possibility "one" for transition from orbital "m" to orbital "l"
@@ -110,7 +111,7 @@ print('There are {} number of nonzero elements in matrix AdaggerA. '.format(Adag
 #
 # read in and assign the device Hamiltonian using sisl (let's just try it out)
 print('\nStart reading in the unperturbed Hamiltonian (H_0). \n')
-H_0 = sisl.Hamiltonian.read('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.fdf')
+H_0 = sisl.Hamiltonian.read('sample_input/MoS2.fdf')
 
 #print(H_0)
 print('The Hamiltonian term on the first orbital of the first atom in the device region is equal to {}.'.format(H_0[180*9+0,180*9+0,0]))
@@ -122,10 +123,10 @@ print('Selecting part of the unperturbed Hamiltonian that belongs to the device 
 #except:
     #np.save('H_0_lm.dat.txt', H_0_lm)
 
-H_0_lm = np.zeros((198*9,198*9,1))
+H_0_lm = np.zeros((198*9,198*9,1), dtype=np.complex64)
 for l in range(0,198*9):
     for m in range(0,198*9):
-        H_0_lm[l,m] = H_0[180*9+l,180*9+m,0]
+        H_0_lm[l,m] = (-1j)*H_0[180*9+l,180*9+m,0]
 
 #print(H_0_lm)
 print('It tests if the script correctly read the H_0 in the device region: {}.'.format(H_0_lm[0,0,0]))
@@ -185,7 +186,7 @@ print('H_perturbation_device shape after assignment: {}'.format(np.shape(H_pertu
 H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_device, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation_device. '.format(H_pertb_device_nonzero_elm))
 
-H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0]
+H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = (-1)*H_perturbation_device[:,:,0]
 print(nonzero_idx[500][0], nonzero_idx[500][1], H_perturbation[nonzero_idx[500][0],nonzero_idx[500][1],:])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
