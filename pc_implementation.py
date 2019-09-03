@@ -18,14 +18,16 @@ time_begin = time.time()
 # assign the constant variables
 print('Start assigning the constant variables. \n')
 c = constants.value('speed of light in vacuum')
-N = 10 # number of photons (it will be asked from the user in the later versions)
+N = 10 #*(10**(6)) # number of photons (it will be asked from the user in the later versions)
 e_charge = constants.value('elementary charge') # elementary charge
 pi_value = constants.pi # value of pi constant
-mu_r = 2.0*(10**(-6)) # relative magnetic susceptibilit (PRL110,247201 (2013))
-epsilon_r = 15.2 # relative electric constant (experimental from PRB91, 125304 (2015) and PRB3, 4286 (1971))
-epsilon = 1 # dielectric constant (for simplicity let's assume it is in vacuum)
+mu = constants.mu_0 # the magnetic constant // magnetic susceptibility === m kg s-2 A-2
+mu_r = 1.0*mu # 2.0*(10**(-6)) # relative magnetic susceptibilit (PRL110,247201 (2013))
+epsilon = constants.epsilon_0 # dielectric constant === A2·s4·kg−1·m−3
+epsilon_r = 5.0 * epsilon # 15.2!!!?? relative electric constant (experimental from PRB91, 125304 (2015) and PRB3, 4286 (1971))
 
-distance_phsource = 100*(10**(-9)) # distance from light source to the monolayer surface 
+print(mu, epsilon)
+distance_phsource = 10*(10**(-3)) # distance from light source to the monolayer surface 
 # reading the coordinates of the atoms at the device's boundary
 geom_fh = sisl.io.siesta.xvSileSiesta('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.XV')
 geom = geom_fh.read_geometry()
@@ -40,7 +42,7 @@ V = distance_phsource * area_phproj # the volume in which light propagates from 
 
 h = constants.value('Planck constant in eV s') # the Planck constant
 h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi
-E_gap = 1.7 # energy gap calculated for 2H-phase of MoS2 monolayer (from Transmission or DOS outputs)
+E_gap = 2.0 # 2.5 [eV] energy gap calculated for 2H-phase of MoS2 monolayer (from Transmission or DOS outputs)
 omega = E_gap / h_bar# the frequency of the light (for simplicity let's consider it equal to E_gap = = h_bar * omega)
 
 print('h_bar is equal to {}. '.format(h_bar))
@@ -51,7 +53,7 @@ I_omega = (N * c)/(V * math.sqrt(mu_r * epsilon_r))
 print('Photon flux is equal to {} N_ph/m^2.s. '.format(I_omega))
 
 # the photon intensity is defined as !!!!!??????
-lambda_value = 10*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm)
+lambda_value = 10*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm) TOO SMALL!!??!?
 Intensity = I_omega * (h * c)/(lambda_value)
 print('Photon intensity is equal to {} (N_ph/m^2.s)*(ev/s). '.format(Intensity))
 
@@ -180,7 +182,7 @@ atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axi
 print('There are {} nonzero elements in matrix atom_distance. '.format(atom_distance_nonzero_elm))
 
 # perturbation Hamiltonian
-H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1)) #, dtype=np.complex64)
+H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1), dtype=np.complex64)
 print(np.shape(H_perturbation))
 H_perturbation_device = np.zeros((198*9,198*9,1))
 print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_perturbation_device)))
@@ -206,10 +208,10 @@ print('There are {} number of non-zero elements in the H_perturbation_device. '.
 #H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_device[:,:,0] #(-1j)*
 # I sould generalize it to include the effect of perturbation on other images.
 for n_img in range(0,9):
-    print(180*9+558*9*n_img - 180*9+198*9+558*9*n_img)
-    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = H_perturbation_device[:,:,0] #(-1j)*
+    print((180*9+558*9*n_img)-(180*9+198*9+558*9*n_img))
+    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = (-1j)*H_perturbation_device[:,:,0] #(-1j)*
 
-print(180*9, 180*9, H_perturbation[180*9,180*9,:])
+#print(180*9, 180*9, H_perturbation[180*9,180*9,:])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
