@@ -18,16 +18,15 @@ time_begin = time.time()
 # assign the constant variables
 print('Start assigning the constant variables. \n')
 c = constants.value('speed of light in vacuum')
-N = 10 #*(10**(6)) # number of photons (it will be asked from the user in the later versions)
+#N = 10 #*(10**(6)) # number of photons (it will be asked from the user in the later versions)
 e_charge = constants.value('elementary charge') # elementary charge
 pi_value = constants.pi # value of pi constant
 mu = constants.mu_0 # the magnetic constant // magnetic susceptibility === m kg s-2 A-2
-mu_r = 1.0*mu # 2.0*(10**(-6)) # relative magnetic susceptibilit (PRL110,247201 (2013))
+mu_r = 1.0 # 2.0*(10**(-6)) # relative magnetic susceptibility (It's DIMENSIONLESS!!!) (PRL110,247201 (2013))
 epsilon = constants.epsilon_0 # dielectric constant === A2·s4·kg−1·m−3
-epsilon_r = 5.0 * epsilon # 15.2!!!?? relative electric constant (experimental from PRB91, 125304 (2015) and PRB3, 4286 (1971))
+epsilon_r = 15.0 # relative electric constant (It's DIMENSIONLESS!!!) outofplane = 6.4 inplane = 15.1  (experimental from PRB91, 125304 (2015) and PRB3, 4286 (1971)) (calculation from Laturia, Akash npj 2D Materials and Applications 2018, DOI:10.1038/s41699-018-0050-x)
 
 print(mu, epsilon)
-distance_phsource = 10*(10**(-3)) # distance from light source to the monolayer surface 
 # reading the coordinates of the atoms at the device's boundary
 geom_fh = sisl.io.siesta.xvSileSiesta('/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine/MoS2.XV')
 geom = geom_fh.read_geometry()
@@ -38,24 +37,42 @@ z_end = geom[377,2]
 #print(geom)
 print('These are the device boundaries: \n x_beg:{}, x_end:{}, z_beg:{}, z_end:{}'.format(x_beg,z_beg,x_end,z_end)) # these coordinates are in Angstrom
 area_phproj = ((x_end-x_beg)*(z_end-z_beg))*(10**(-20)) # area on which the light is shined.
-V = distance_phsource * area_phproj # the volume in which light propagates from source to the monolayer surface under the projected light.
 
-h = constants.value('Planck constant in eV s') # the Planck constant
-h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi
-E_gap = 2.0 # 2.5 [eV] energy gap calculated for 2H-phase of MoS2 monolayer (from Transmission or DOS outputs)
-omega = E_gap / h_bar# the frequency of the light (for simplicity let's consider it equal to E_gap = = h_bar * omega)
-
+h = constants.value('Planck constant in eV s') # the Planck constant in eV
+h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi in eV
 print('h_bar is equal to {}. '.format(h_bar))
-#print(constants.value('Planck constant over 2 pi in eV s'))
+
+# assign the energy gap of MoS2 monolayer
+E_gap = 1.73 # energy gap calculated for 2H-phase of MoS2 monolayer (from DFT bandgap calculation)
+
+# read in the photon energy and power density from user
+power_density = float(input('Please enter the power density in (W/m^2): '))
+photon_energy = float(input('Please enter the photon energy in (eV): '))
+
+print('These are photon properties: \n')
+if photon_energy >= E_gap:
+    print('photon energy {} is greater than or equal to the bandgap ().\n'.format(photon_energy,E_gap))
+else:
+    print('photon energy {} is smaller than the bandgap {}.\n'.format(photon_energy,E_gap))
+
+omega = photon_energy / h_bar # the frequency of the projected light
+lambda_value = (2 * pi_value * c)/omega # the wavelength of the projected light
+print('photon frequency (times 2pi), omega = {} s^-1, and photon wavelength, lambda = {} m. \n'.format(omega, lambda_value))
 
 # the photon flux is defined as the number of photons per unit time per unit area
-I_omega = (N * c)/(V * math.sqrt(mu_r * epsilon_r))
-print('Photon flux is equal to {} N_ph/m^2.s. '.format(I_omega))
+I_omega = power_density / (e_charge * photon_energy)
+
+distance_phsource = 1000*(10**(-3)) # distance from light source to the monolayer surface 
+V = distance_phsource * (400*400*3.14) # the volume in which light propagates from source to the monolayer surface under the projected light.
+N = (1.0/c) * I_omega * V * math.sqrt(mu_r * epsilon_r) # number of photons
+
+print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting the area of {} m^2 over the scattering region. \n'.format(I_omega, N, 400*400*3.14))
 
 # the photon intensity is defined as !!!!!??????
-lambda_value = 10*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm) TOO SMALL!!??!?
-Intensity = I_omega * (h * c)/(lambda_value)
-print('Photon intensity is equal to {} (N_ph/m^2.s)*(ev/s). '.format(Intensity))
+#lambda_value = 740*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm) TOO SMALL!!??!?
+#Intensity = I_omega * (constants.value('Planck constant') * c)/(lambda_value) # h in Joul => Intensity (light power) in W/m^2
+#print(constants.value('Planck constant'), c, constants.value('Planck constant') * c)
+#print('Photon intensity is equal to {} (N_ph/m^2.s)*(J/s). '.format(Intensity))
 
 # DENSITY MATRIX
 #
