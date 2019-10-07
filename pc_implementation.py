@@ -14,6 +14,7 @@ import numpy as np
 from scipy import constants, sparse, io
 import time
 
+
 time_begin = time.time()
 # assign the constant variables
 print('Start assigning the constant variables. \n')
@@ -23,7 +24,7 @@ e_charge = constants.value('elementary charge') # elementary charge
 pi_value = constants.pi # value of pi constant
 mu = constants.mu_0 # the magnetic constant // magnetic susceptibility === m kg s-2 A-2
 mu_r = 1.0 # 2.0*(10**(-6)) # relative magnetic susceptibility (It's DIMENSIONLESS!!!) (PRL110,247201 (2013))
-epsilon = constants.epsilon_0 # dielectric constant === A2·s4·kg−1·m−3
+epsilon = constants.epsilon_0*((55.26349406*(10**(6)))/constants.epsilon_0) # dielectric constant === A2·s4·kg−1·m−3 => e2.GeV-1.fm-1
 epsilon_r = 15.0 # relative electric constant (It's DIMENSIONLESS!!!) outofplane = 6.4 inplane = 15.1  (experimental from PRB91, 125304 (2015) and PRB3, 4286 (1971)) (calculation from Laturia, Akash npj 2D Materials and Applications 2018, DOI:10.1038/s41699-018-0050-x)
 
 print(mu, epsilon)
@@ -36,11 +37,11 @@ x_end = geom[182,0]
 z_end = geom[377,2]
 #print(geom)
 print('These are the device boundaries: \n x_beg:{}, x_end:{}, z_beg:{}, z_end:{}'.format(x_beg,z_beg,x_end,z_end)) # these coordinates are in Angstrom
-area_phproj = ((x_end-x_beg)*(z_end-z_beg))*(10**(-20)) # area on which the light is shined.
+area_phproj = ((x_end-x_beg)*(z_end-z_beg))*(10**(0)) # area on which the light is shined.
 
 h = constants.value('Planck constant in eV s') # the Planck constant in eV
 h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi in eV
-print('h_bar is equal to {}. '.format(h_bar))
+print('h_bar is equal to {} eV. '.format(h_bar))
 
 # assign the energy gap of MoS2 monolayer
 E_gap = 1.73 # energy gap calculated for 2H-phase of MoS2 monolayer (from DFT bandgap calculation)
@@ -51,7 +52,7 @@ photon_energy = float(input('Please enter the photon energy in (eV): '))
 
 print('These are photon properties: \n')
 if photon_energy >= E_gap:
-    print('photon energy {} is greater than or equal to the bandgap ().\n'.format(photon_energy,E_gap))
+    print('photon energy {} is greater than or equal to the bandgap {}.\n'.format(photon_energy,E_gap))
 else:
     print('photon energy {} is smaller than the bandgap {}.\n'.format(photon_energy,E_gap))
 
@@ -63,10 +64,10 @@ print('photon frequency (times 2pi), omega = {} s^-1, and photon wavelength, lam
 I_omega = power_density / (e_charge * photon_energy)
 
 distance_phsource = 1000*(10**(-3)) # distance from light source to the monolayer surface 
-V = distance_phsource * (400*400*3.14) # the volume in which light propagates from source to the monolayer surface under the projected light.
+V = distance_phsource * area_phproj # * (400*400*(10**(-12))*3.14) # the volume in which light propagates from source to the monolayer surface under the projected light.
 N = (1.0/c) * I_omega * V * math.sqrt(mu_r * epsilon_r) # number of photons
 
-print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting the area of {} m^2 over the scattering region. \n'.format(I_omega, N, 400*400*3.14))
+print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting the area of {} Ang^2 over the scattering region. \n'.format(I_omega, N, area_phproj))
 
 # the photon intensity is defined as !!!!!??????
 #lambda_value = 740*(10**(-9)) # 500*(10**(-9)) # visible light wavelength (380 - 740 nm) TOO SMALL!!??!?
@@ -192,7 +193,7 @@ for ai in range(0,198): # ai atom index
 atom_distance = np.zeros((198*9,198*9,1))
 for aoi1 in range(0,198*9): # aoi1 and aoi2 are atom_orbital indices = atom*orbital
    for aoi2 in range(0,198*9):
-       atom_distance[aoi1,aoi2] = orbital_coordinate[aoi1,1] - orbital_coordinate[aoi2,1] # z_m - z_l 
+       atom_distance[aoi1,aoi2] = (orbital_coordinate[aoi1,1] - orbital_coordinate[aoi2,1])*(10**(0)) # z_m - z_l 
 
 print('atom_distance shape: {} '.format(np.shape(atom_distance)))
 atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axis=2))
@@ -201,13 +202,13 @@ print('There are {} nonzero elements in matrix atom_distance. '.format(atom_dist
 # perturbation Hamiltonian
 H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1), dtype=np.complex64)
 print(np.shape(H_perturbation))
-H_perturbation_device = np.zeros((198*9,198*9,1))
+H_perturbation_device = np.zeros((198*9,198*9,1), dtype=np.complex64)
 print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_perturbation_device)))
 #print(H_perturbation_device)
-#H_perturbation = ((2 * pi_value * e_charge)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
+#H_perturbation = ((2 * pi_value * e_charge = 1)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
 for l in range(0,198*9):
     for m in range(0,198*9):
-        H_perturbation_device[l,m,0] = ((2 * pi_value * e_charge)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
+        H_perturbation_device[l,m,0] = (((1j)* 1)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * ((2 * pi_value * N)**(1/2) * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
         #print(atom_distance[l,m,0])
         #print(H_0_lm[l,m,0])
         #print(AdaggerA[l,m,0])
@@ -226,7 +227,7 @@ print('There are {} number of non-zero elements in the H_perturbation_device. '.
 # I sould generalize it to include the effect of perturbation on other images.
 for n_img in range(0,9):
     print((180*9+558*9*n_img)-(180*9+198*9+558*9*n_img))
-    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = (-1j)*H_perturbation_device[:,:,0] #(-1j)*
+    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = H_perturbation_device[:,:,0] #(-1j)*
 
 #print(180*9, 180*9, H_perturbation[180*9,180*9,:])
 
@@ -235,25 +236,65 @@ print('There are {} number of non-zero elements in the H_perturbation. '.format(
 
 print(np.shape(H_perturbation))
 
+
+print(H_perturbation[1800,16200,0])
+#print(H_perturbation[:,:,1])
+
+
 # HAMILTONIAN ASSIGNMENT
 #
 # write the H_perturbation into a Sparse Matrix and then to a .nc file using sisl
 beg_final_assign = time.time()
-dH = sisl.get_sile('deltaH.dH.nc', 'w')
-final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
-#print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
-#final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
+
 test_csr = sparse.csr_matrix(H_perturbation[:,:,0])
 print(sparse.csr_matrix.count_nonzero(test_csr))
 print(test_csr)
+# A for loop to assign a range of energies to multiple deltaH files.
+#for energies in range(1.6547,1.7,1):#np.linspace(-0.1,2.1,11):
+    #print('*********************'+str(energies)+'*********************')
+    #enrg = int(10*energies)
+    #dH = sisl.get_sile('deltaH_{}.dH.nc'.format(enrg), 'w')
+    #final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
+    ##print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
+    ##final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
+    #print(np.shape(final_H_pertb))
+    #final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
+    #print(final_H_pertb)
+    #dH.write_delta(final_H_pertb, E = energies)#, K=[0,0,0])
+
+
+dH = sisl.get_sile('deltaH_multiE.dH.nc', 'w')
+final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
+#print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
+#final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
 print(np.shape(final_H_pertb))
 final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
+print(final_H_pertb)
+#for energies in np.linspace(-0.1,2.1,121):
+    ##print('*********************'+str(energies)+'*********************')
+    #for kpoints in np.linspace(0,0.5,5):
+        ##print('*********************'+str(kpoints)+'*********************')
+        #dH.write_delta(final_H_pertb, E = energies, k = [kpoints,0,0])
+#for energies in np.linspace(-2.1,2.1,101):
+    ##print('*********************'+str(energies)+'*********************')
+    #dH.write_delta(final_H_pertb, E = energies)
+
+#for kpoints in np.linspace(0,0.5,21):
+    ##print('*********************'+str(kpoints)+'*********************')
+    #dH.write_delta(final_H_pertb, k = [kpoints,0,0])
+
+dH.write_delta(final_H_pertb, k = [0,0,0])
+
+#klist = []
+#for kpoints0 in np.linspace(0,10,1):
+    #klist = [kpoints0,0,0]
+    #print('*********************'+str(kpoints0)+'*********************')
+    #dH.write_delta(final_H_pertb, K = klist)#, K=[0,0,0])
+#print(klist)
 end_final_assign = time.time()
 
-print('Total time for the final assignment of the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
+print('Total time for the final assignment of 11 the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
 
-print(final_H_pertb)
-dH.write_delta(final_H_pertb)
 
 time_end = time.time()
 
