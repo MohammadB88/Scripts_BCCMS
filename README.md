@@ -8,3 +8,6 @@ In this script, one needs to import "sisl" module along with python's built-in m
 
 # pc_implementation.py
 With this script, I will be able to include the effect of photon-electron interactions into my transport calculations. Thus, making possible a perturbative approach in studying photodetector devices based on 2D materials.
+
+# collect_fatbands.py
+I need this script to produce the dat files containing fatbands and select an energy and its fatband of a specific K-point.
