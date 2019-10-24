@@ -65,8 +65,12 @@ I_omega = power_density / (e_charge * photon_energy)
 
 distance_phsource = 1000*(10**(-3)) # distance from light source to the monolayer surface 
 V = distance_phsource * area_phproj # * (400*400*(10**(-12))*3.14) # the volume in which light propagates from source to the monolayer surface under the projected light.
-N = (1.0/c) * I_omega * V * math.sqrt(mu_r * epsilon_r) # number of photons
+#N = (1.0/c) * I_omega * V * math.sqrt(mu_r * epsilon_r) # number of photons
 
+# bose-einstein distribution
+boltzman_constant = constants.value('Boltzmann constant in eV/K')
+photon_temperature = 3000 # Prof. Jacky's suggestion
+N = 1./(math.exp(photon_energy/(boltzman_constant * photon_temperature))-1)
 print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting the area of {} Ang^2 over the scattering region. \n'.format(I_omega, N, area_phproj))
 
 # the photon intensity is defined as !!!!!??????
@@ -208,7 +212,7 @@ print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_pert
 #H_perturbation = ((2 * pi_value * e_charge = 1)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
 for l in range(0,198*9):
     for m in range(0,198*9):
-        H_perturbation_device[l,m,0] = (((1j)* 1)/(h_bar)) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * ((2 * pi_value * N)**(1/2) * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
+        H_perturbation_device[l,m,0] = (((1j)* 1)/(h_bar)) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2) * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
         #print(atom_distance[l,m,0])
         #print(H_0_lm[l,m,0])
         #print(AdaggerA[l,m,0])
@@ -275,15 +279,15 @@ print(final_H_pertb)
     #for kpoints in np.linspace(0,0.5,5):
         ##print('*********************'+str(kpoints)+'*********************')
         #dH.write_delta(final_H_pertb, E = energies, k = [kpoints,0,0])
-#for energies in np.linspace(-2.1,2.1,101):
-    ##print('*********************'+str(energies)+'*********************')
-    #dH.write_delta(final_H_pertb, E = energies)
+for energies in np.linspace(-2.1,2.1,4001):
+    #print('*********************'+str(energies)+'*********************')
+    dH.write_delta(final_H_pertb, E = energies)
 
 #for kpoints in np.linspace(0,0.5,21):
     ##print('*********************'+str(kpoints)+'*********************')
     #dH.write_delta(final_H_pertb, k = [kpoints,0,0])
 
-dH.write_delta(final_H_pertb, k = [0,0,0])
+#dH.write_delta(final_H_pertb, k = [0.14285714,0,0])
 
 #klist = []
 #for kpoints0 in np.linspace(0,10,1):
