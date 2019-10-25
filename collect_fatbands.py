@@ -18,6 +18,18 @@ def mysplit(s):
     #print(head, tail)
     return head, tail
 
+PATH = os.getcwd()
+print('The working directory: \n{}'.format(PATH))
+strain_list=[]
+for fat_dir in next(os.walk(PATH))[1]:
+    #print(fat_dir)
+    strain = float(mysplit(fat_dir)[1])
+    #print(strain)
+    strain_list.append(strain)
+    
+strain_list.sort()
+print(strain_list)
+
 def readable_fatbands(path_eigfat2plot, eigfat_file, dat_file):
     """ 
     It makes the output fatbands readable and write them into a .dat file.
@@ -54,13 +66,12 @@ def from_datfile(path_datfile, number):
     linecache.clearcache()
     return energy, fatband
 
-PATH = './'
 
 # ***************************************************************************************************
 # Start producing the datfiles.
-for fat_dir in next(os.walk(PATH))[1]:
-    print(fat_dir)
-    os.chdir(fat_dir+'/fatbands/')
+for strain in strain_list:
+    print(strain)
+    os.chdir('strain{}/fatbands/'.format(strain))
     shutil.copy('../../../strain0.0/fatbands/MoS2.mpr', './')
     shutil.copy('MoS2.bands.WFSX','MoS2.WFSX')
     subprocess.run(['/home/mb1988/opt/siesta-4.1-b3/Util/COOP/fat', 'MoS2'])
@@ -78,27 +89,23 @@ for fat_dir in next(os.walk(PATH))[1]:
 # Start reading in the desired properties and writing them into the appropriate output for the case of 4dx2-y2.
 fhand = open('v_2stop_fatbands_4dx2-y2.dat', 'w')
 
-# First read the energy and its corresponding fatbands for the case of strain0.0
 print(linecache.getline('../strain0.0/fatbands/Mo.4dx2-y2.dat', 96))
 energy_lower, fatbands_lower = from_datfile('../strain0.0/fatbands/Mo.4dx2-y2.dat', 96)
+fhand.write('   ' + str(0.0) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
+for strain in strain_list:
+    print(strain)
+    print(linecache.getline('strain{}/fatbands/Mo.4dx2-y2.dat'.format(strain), 96))
+    energy_lower, fatbands_lower = from_datfile('strain{}/fatbands/Mo.4dx2-y2.dat'.format(strain), 96)
+    fhand.write('   ' + str(strain) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
+
 print(linecache.getline('../strain0.0/fatbands/Mo.4dx2-y2.dat', 188))
 energy_upper, fatbands_upper = from_datfile('../strain0.0/fatbands/Mo.4dx2-y2.dat', 188)
-fhand.write('   ' + str(0.0) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
 fhand.write('   ' + str(0.0) + '        ' + energy_upper + '        ' + fatbands_upper + '\n')
-
-for fat_dir in next(os.walk(PATH))[1]:
-    print(fat_dir)
-    #print(mysplit(fat_dir)[0], mysplit(fat_dir)[1])
-    strain = float(mysplit(fat_dir)[1])
+for strain in strain_list:
     print(strain)
-    #os.chdir(fat_dir)
-    print(linecache.getline(fat_dir+'/fatbands/Mo.4dx2-y2.dat', 96))
-    energy_lower, fatbands_lower = from_datfile(fat_dir+'/fatbands/Mo.4dx2-y2.dat', 96)
-    print(linecache.getline(fat_dir+'/fatbands/Mo.4dx2-y2.dat', 188))
-    energy_upper, fatbands_upper = from_datfile(fat_dir+'/fatbands/Mo.4dx2-y2.dat', 188)
-    fhand.write('   ' + str(strain) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
+    print(linecache.getline('strain{}/fatbands/Mo.4dx2-y2.dat'.format(strain), 188))
+    energy_upper, fatbands_upper = from_datfile('strain{}/fatbands/Mo.4dx2-y2.dat'.format(strain), 188)
     fhand.write('   ' + str(strain) + '        ' + energy_upper + '        ' + fatbands_upper + '\n')
-    #os.chdir('../')
   
 fhand.close()
 
@@ -106,26 +113,22 @@ fhand.close()
 # Start reading in the desired properties and writing them into the appropriate output for the case of 4dxy.
 fhand = open('v_2stop_fatbands_4dxy.dat', 'w')
 
-# First read the energy and its corresponding fatbands for the case of strain0.0
 print(linecache.getline('../strain0.0/fatbands/Mo.4dxy.dat', 96))
 energy_lower, fatbands_lower = from_datfile('../strain0.0/fatbands/Mo.4dxy.dat', 96)
+fhand.write('   ' + str(0.0) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
+for strain in strain_list:
+    print(strain)
+    print(linecache.getline('strain{}/fatbands/Mo.4dxy.dat'.format(strain), 96))
+    energy_lower, fatbands_lower = from_datfile('strain{}/fatbands/Mo.4dxy.dat'.format(strain), 96)
+    fhand.write('   ' + str(strain) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
+
 print(linecache.getline('../strain0.0/fatbands/Mo.4dxy.dat', 188))
 energy_upper, fatbands_upper = from_datfile('../strain0.0/fatbands/Mo.4dxy.dat', 188)
-fhand.write('   ' + str(0.0) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
 fhand.write('   ' + str(0.0) + '        ' + energy_upper + '        ' + fatbands_upper + '\n')
-
-for fat_dir in next(os.walk(PATH))[1]:
-    print(fat_dir)
-    #print(mysplit(fat_dir)[0], mysplit(fat_dir)[1])
-    strain = float(mysplit(fat_dir)[1])
+for strain in strain_list:
     print(strain)
-    #os.chdir(fat_dir)
-    print(linecache.getline(fat_dir+'/fatbands/Mo.4dxy.dat', 96))
-    energy_lower, fatbands_lower = from_datfile(fat_dir+'/fatbands/Mo.4dxy.dat', 96)
-    print(linecache.getline(fat_dir+'/fatbands/Mo.4dxy.dat', 188))
-    energy_upper, fatbands_upper = from_datfile(fat_dir+'/fatbands/Mo.4dxy.dat', 188)
-    fhand.write('   ' + str(strain) + '        ' + energy_lower + '        ' + fatbands_lower + '\n')
+    print(linecache.getline('strain{}/fatbands/Mo.4dxy.dat'.format(strain), 188))
+    energy_upper, fatbands_upper = from_datfile('strain{}/fatbands/Mo.4dxy.dat'.format(strain), 188)
     fhand.write('   ' + str(strain) + '        ' + energy_upper + '        ' + fatbands_upper + '\n')
-    #os.hdir('../')
     
 fhand.close()
