@@ -40,7 +40,7 @@ print('These are the device boundaries: \n x_beg:{}, x_end:{}, z_beg:{}, z_end:{
 area_phproj = ((x_end-x_beg)*(z_end-z_beg))*(10**(0)) # area on which the light is shined.
 
 h = constants.value('Planck constant in eV s') # the Planck constant in eV
-h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi in eV
+h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi in eV.s
 print('h_bar is equal to {} eV. '.format(h_bar))
 
 # assign the energy gap of MoS2 monolayer
@@ -63,14 +63,14 @@ print('photon frequency (times 2pi), omega = {} s^-1, and photon wavelength, lam
 # the photon flux is defined as the number of photons per unit time per unit area
 I_omega = power_density / (e_charge * photon_energy)
 
-distance_phsource = 1000*(10**(-3)) # distance from light source to the monolayer surface 
+distance_phsource = 1000*(10**(-9)) # distance from light source to the monolayer surface 
 V = distance_phsource * area_phproj # * (400*400*(10**(-12))*3.14) # the volume in which light propagates from source to the monolayer surface under the projected light.
-#N = (1.0/c) * I_omega * V * math.sqrt(mu_r * epsilon_r) # number of photons
+N = (1.0/c) * I_omega * V * math.sqrt(mu_r * epsilon_r) # number of photons
 
 # bose-einstein distribution
-boltzman_constant = constants.value('Boltzmann constant in eV/K')
-photon_temperature = 3000 # Prof. Jacky's suggestion
-N = 1./(math.exp(photon_energy/(boltzman_constant * photon_temperature))-1)
+#boltzman_constant = constants.value('Boltzmann constant in eV/K')
+#photon_temperature = 3000 # Prof. Jacky's suggestion
+#N = 1./(math.exp(photon_energy/(boltzman_constant * photon_temperature))-1)
 print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting the area of {} Ang^2 over the scattering region. \n'.format(I_omega, N, area_phproj))
 
 # the photon intensity is defined as !!!!!??????
@@ -102,7 +102,7 @@ M._csr._D[:,:] *= DM._csr._D[:,-1].reshape(-1,1)
 #print(M)
 tmp_nonzero = 0 
 tmp_zero = 0 
-threshold = 0.1 # amount of Mulliken charge to consider an orbital occupied.
+threshold = 0.5 # amount of Mulliken charge to consider an orbital occupied.
 a_m = [] # occupied states = 1, unoccupied states = 0
 adagger_l = [] # occupied states = 0, unoccupied states = 1
 for i in range(180*9,180*9+198*9):
@@ -168,7 +168,7 @@ for l in range(0,198*9):
     for m in range(0,198*9):
         H_0_lm[l,m] = H_0[180*9+l,180*9+m,0]
 
-#print(H_0_lm)
+print(H_0_lm[180*9:180*9+198*9,180*9:180*9+198*9,0])
 print('It tests if the script correctly read the H_0 in the device region: {}.'.format(H_0_lm[0,0,0]))
 print('H_0_lm shape: {}'.format(np.shape(H_0_lm)))
 H_0_lm_nonzero_elm = np.count_nonzero(np.count_nonzero(H_0_lm, axis=2))
@@ -197,14 +197,14 @@ for ai in range(0,198): # ai atom index
 atom_distance = np.zeros((198*9,198*9,1))
 for aoi1 in range(0,198*9): # aoi1 and aoi2 are atom_orbital indices = atom*orbital
    for aoi2 in range(0,198*9):
-       atom_distance[aoi1,aoi2] = (orbital_coordinate[aoi1,1] - orbital_coordinate[aoi2,1])*(10**(0)) # z_m - z_l 
+       atom_distance[aoi1,aoi2] = (orbital_coordinate[aoi1,1] - orbital_coordinate[aoi2,1])*(10**(-9)) # z_m - z_l 
 
 print('atom_distance shape: {} '.format(np.shape(atom_distance)))
 atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axis=2))
 print('There are {} nonzero elements in matrix atom_distance. '.format(atom_distance_nonzero_elm))
 
 # perturbation Hamiltonian
-H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1), dtype=np.complex64)
+H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1))#, dtype=np.complex64)
 print(np.shape(H_perturbation))
 H_perturbation_device = np.zeros((198*9,198*9,1), dtype=np.complex64)
 print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_perturbation_device)))
@@ -212,12 +212,13 @@ print('H_perturbation_device shape before assignment: {}'.format(np.shape(H_pert
 #H_perturbation = ((2 * pi_value * e_charge = 1)/(h_bar)) * (z_m - z_l) * (((h_bar)/(2 * omega * epsilon * V))**(1/2)) * (N * delta_energy) * (H_0) * (AdaggerA)
 for l in range(0,198*9):
     for m in range(0,198*9):
-        H_perturbation_device[l,m,0] = (((1j)* 1)/(h_bar)) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2) * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
+        H_perturbation_device[l,m,0] = (((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2) * delta_energy) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] # atom_distance = (z_m - z_l)
         #print(atom_distance[l,m,0])
         #print(H_0_lm[l,m,0])
         #print(AdaggerA[l,m,0])
         #print(H_perturbation_device[l,m,0])
 
+print(H_perturbation_device[180*9:180*9+198*9,180*9:180*9+198*9,0])
 print('\n***** I may have to devide this perturbation by "2" because <l|H_pertb|m> = <m|H_pertb|l>. *****')
 
 #print(H_perturbation_device)
@@ -231,7 +232,7 @@ print('There are {} number of non-zero elements in the H_perturbation_device. '.
 # I sould generalize it to include the effect of perturbation on other images.
 for n_img in range(0,9):
     print((180*9+558*9*n_img)-(180*9+198*9+558*9*n_img))
-    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = H_perturbation_device[:,:,0] #(-1j)*
+    H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = (-1j)*H_perturbation_device[:,:,0] #(-1j)*
 
 #print(180*9, 180*9, H_perturbation[180*9,180*9,:])
 
@@ -241,7 +242,7 @@ print('There are {} number of non-zero elements in the H_perturbation. '.format(
 print(np.shape(H_perturbation))
 
 
-print(H_perturbation[1800,16200,0])
+print(H_perturbation[1620, 1728,0])
 #print(H_perturbation[:,:,1])
 
 
@@ -279,14 +280,15 @@ print(final_H_pertb)
     #for kpoints in np.linspace(0,0.5,5):
         ##print('*********************'+str(kpoints)+'*********************')
         #dH.write_delta(final_H_pertb, E = energies, k = [kpoints,0,0])
-for energies in np.linspace(-2.1,2.1,4001):
-    #print('*********************'+str(energies)+'*********************')
-    dH.write_delta(final_H_pertb, E = energies)
+#for energies in np.linspace(-2.1,2.1,2001):
+    ##print('*********************'+str(energies)+'*********************')
+    #dH.write_delta(final_H_pertb, E = energies)
 
 #for kpoints in np.linspace(0,0.5,21):
     ##print('*********************'+str(kpoints)+'*********************')
     #dH.write_delta(final_H_pertb, k = [kpoints,0,0])
 
+dH.write_delta(final_H_pertb)
 #dH.write_delta(final_H_pertb, k = [0.14285714,0,0])
 
 #klist = []
