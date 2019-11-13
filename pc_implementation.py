@@ -33,7 +33,7 @@ h_bar = h/(2*pi_value) # the Planck constant devided by 2*pi in eV.s
 
 print('mu = {} m.kg.s-2.A-2'.format(mu))
 print('epsilon = {} e2.GeV-1.fm-1'.format(epsilon))
-print('h_bar = {} eV. '.format(h_bar))
+print('h_bar = {} eV.s. '.format(h_bar))
 
 E_gap = 1.73 # energy gap calculated for 2H-phase of MoS2 monolayer (from DFT bandgap calculation)
 print('Energy gap of the 2H MoS2 monolayer = {} eV. '.format(E_gap))
@@ -194,7 +194,10 @@ H_0 = sisl.Hamiltonian.read('{}/MoS2.fdf'.format(path_wd))
 #io = H_0.geometry.a2o(1) # python is 0-based
 #print(io, io+0, H_0[io+0,io+0])
 #print(io, io+5022*2+0, H_0[io+0,io+5022*2+0])
-print('The Hamiltonian term on the first orbital of the first atom in the device region is equal to {}.'.format(H_0[180*9+0,180*9+0,0]))
+for supercell_number in range(0,9):
+    print(' supercell_number= {} , H_0[180*9+197*9+8,180*9+155*9+3,0] = {} eV'.format(supercell_number, H_0[180*9+197*9+8,180*9+155*9+3+558*9*supercell_number,0]))
+    
+print('\nH_0[180*9+197*9+8,180*9+155*9+3,0] = {} eV'.format(H_0[180*9+197*9+8,180*9+155*9+3,0]))
 print('shape of the H_0: ',np.shape(H_0))
 
 print('Selecting part of the unperturbed Hamiltonian that belongs to the device region (H_0_lm).')
@@ -204,7 +207,7 @@ for l in range(0,198*9):
     for m in range(0,198*9):
         H_0_lm[l,m] = H_0[180*9+l,180*9+m,0]
 #H_0_lm[:,:] = H_0[io:io+198*9,io:io+198*9,0]
-print('H_0_lm[0,0,0] = ',H_0_lm[0,0,0])
+print('H_0_lm[197*9+8,155*9+3,0] = {} eV'.format(H_0_lm[197*9+8,155*9+3,0]))
 
 #print(H_0_lm[180*9:180*9+198*9,180*9:180*9+198*9,0])
 if H_0_lm[0,0,0] == H_0[180*9+0,180*9+0,0]:
@@ -242,6 +245,7 @@ for aoi1 in range(0,198*9): # aoi1 and aoi2 are atom_orbital indices = atom*orbi
    for aoi2 in range(0,198*9):
        atom_distance[aoi1,aoi2] = (orbital_coordinate[aoi1,1] - orbital_coordinate[aoi2,1])*(10**(-10)) 
 
+print('atom_distance[197*9+8,155*9+3,0] = ' ,atom_distance[197*9+8,155*9+3,0])
 print('atom_distance shape: {} '.format(np.shape(atom_distance)))
 atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axis=2))
 print('There are {} nonzero elements in matrix atom_distance. \n'.format(atom_distance_nonzero_elm))
@@ -261,6 +265,12 @@ delta_energy = 1
 # CALCULATE THE PERTURBATION HAMILTONIAN OF THE CENTRAL REGION
 # H_perturbation_centr
 #
+#
+# In order to test this relations, multiply the number below to the atom_distance and H_0_lm,
+# then compare it with the corresponding perturbation Hamiltonian
+# 
+
+print('(((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2))= ', (((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2)))
 
 H_perturbation_centr = np.zeros((198*9,198*9,1), dtype=np.complex64)
 print('H_perturbation_centr shape before assignment: {}'.format(np.shape(H_perturbation_centr)))
@@ -268,16 +278,11 @@ print('H_perturbation_centr shape before assignment: {}'.format(np.shape(H_pertu
 for l in range(0,198*9):
     for m in range(0,198*9):
         H_perturbation_centr[l,m,0] = (((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2)) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] 
-        if H_perturbation_centr[l,m,0] != 0.0:
-            print(H_perturbation_centr[l,m,0])
-        #print(atom_distance[l,m,0])
-        #print(H_0_lm[l,m,0])
-        #print(AdaggerA[l,m,0])
-        #print(H_perturbation_centr[l,m,0])
+        #if H_perturbation_centr[l,m,0] != 0.0:
+            #print(l, m, H_perturbation_centr[l,m,0])
 
 #print(H_perturbation_centr)
-
-#print(',H_perturbation_centr[0,0,0] = ' ,H_perturbation_centr[0,0,0])
+print('H_perturbation_centr[197*9+8,155*9+3,0] = {} eV'.format(H_perturbation_centr[197*9+8,155*9+3,0]))
 
 #print(H_perturbation_centr[180*9:180*9+198*9,180*9:180*9+198*9,0])
 #print('\n***** I may have to devide this perturbation by "2" because <l|H_pertb|m> = <m|H_pertb|l>. *****')
@@ -285,90 +290,92 @@ for l in range(0,198*9):
 H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_centr, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation_centr. \n '.format(H_pertb_device_nonzero_elm))
 
-## ********************************************************************************
-## CALCULATE THE PERTURBATION HAMILTONIAN OF THE WHOLE DEVICE
-## H_perturbation
-##
+# ********************************************************************************
+# CALCULATE THE PERTURBATION HAMILTONIAN OF THE WHOLE DEVICE
+# H_perturbation
+#
 
-#H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1))#, dtype=np.complex64)
+H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1), dtype=np.complex64)
 #print(np.shape(H_perturbation))
 
-## This is only for the first image. 
-##H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
-## I sould generalize it to include the effect of perturbation on other images.
-#for n_img in range(0,9):
-    #print((180*9+558*9*n_img)-(180*9+198*9+558*9*n_img))
-    #H_perturbation[180*9:180*9+198*9,180*9+558*9*n_img:180*9+198*9+558*9*n_img,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
+# This is only for the first image. 
+#H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
+# I sould generalize it to include the effect of perturbation on other images.
+#for supercell_number in range(0,9):
+    #print((180*9+558*9*supercell_number)-(180*9+198*9+558*9*supercell_number))
+    #H_perturbation[180*9:180*9+198*9,180*9+558*9*supercell_number:180*9+198*9+558*9*supercell_number,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
 
-##print(180*9, 180*9, H_perturbation[180*9,180*9,:])
+H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
 
-#H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
-#print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
+for supercell_number in range(0,9):
+    print(' supercell_number= {} , H_perturbation[180*9+197*9+8,180*9+155*9+3,0] = {} eV'.format(supercell_number, H_perturbation[180*9+197*9+8,180*9+155*9+3+558*9*supercell_number,0]))
+    
+print('\nH_perturbation[180*9+197*9+8,180*9+155*9+3,0] = ' ,H_perturbation[180*9+197*9+8,180*9+155*9+3,0])
 
-#print(np.shape(H_perturbation))
+H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
+print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
+
+print(np.shape(H_perturbation))
+
+# ********************************************************************************
+# HAMILTONIAN ASSIGNMENT
+#
+# write the H_perturbation into a Sparse Matrix and then to a .nc file using sisl
+#
+
+beg_final_assign = time.time()
+
+test_csr = sparse.csr_matrix(H_perturbation[:,:,0])
+print(sparse.csr_matrix.count_nonzero(test_csr))
+print(test_csr)
+# A for loop to assign a range of energies to multiple deltaH files.
+#for energies in range(1.6547,1.7,1):#np.linspace(-0.1,2.1,11):
+    #print('*********************'+str(energies)+'*********************')
+    #enrg = int(10*energies)
+    #dH = sisl.get_sile('deltaH_{}.dH.nc'.format(enrg), 'w')
+    #final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
+    ##print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
+    ##final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
+    #print(np.shape(final_H_pertb))
+    #final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
+    #print(final_H_pertb)
+    #dH.write_delta(final_H_pertb, E = energies)#, K=[0,0,0])
 
 
-#print(H_perturbation[1620, 1728,0])
-##print(H_perturbation[:,:,1])
+dH = sisl.get_sile('deltaH_multiE.dH.nc', 'w')
+final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
+#print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
+#final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
+print(np.shape(final_H_pertb))
+print(fdf.read_geometry())
+final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
+print(final_H_pertb)
 
-## ********************************************************************************
-## HAMILTONIAN ASSIGNMENT
-##
-## write the H_perturbation into a Sparse Matrix and then to a .nc file using sisl
-#beg_final_assign = time.time()
-
-#test_csr = sparse.csr_matrix(H_perturbation[:,:,0])
-#print(sparse.csr_matrix.count_nonzero(test_csr))
-#print(test_csr)
-## A for loop to assign a range of energies to multiple deltaH files.
-##for energies in range(1.6547,1.7,1):#np.linspace(-0.1,2.1,11):
+## Energy and kpoint dependent perturbation Hamiltonian
+#for energies in np.linspace(-0.1,2.1,121):
     ##print('*********************'+str(energies)+'*********************')
-    ##enrg = int(10*energies)
-    ##dH = sisl.get_sile('deltaH_{}.dH.nc'.format(enrg), 'w')
-    ##final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
-    ###print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
-    ###final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
-    ##print(np.shape(final_H_pertb))
-    ##final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
-    ##print(final_H_pertb)
-    ##dH.write_delta(final_H_pertb, E = energies)#, K=[0,0,0])
+    #for kpoints in np.linspace(0,0.5,5):
+        ##print('*********************'+str(kpoints)+'*********************')
+        #dH.write_delta(final_H_pertb, E = energies, k = [kpoints,0,0])
 
+## Energy dependent perturbation Hamiltonian
+#for energies in np.linspace(-2.1,2.1,2001):
+    ##print('*********************'+str(energies)+'*********************')
+    #dH.write_delta(final_H_pertb, E = energies)
 
-#dH = sisl.get_sile('deltaH_multiE.dH.nc', 'w')
-#final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
-##print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
-##final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
-#print(np.shape(final_H_pertb))
-#print(fdf.read_geometry())
-#final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
-#print(final_H_pertb)
-##for energies in np.linspace(-0.1,2.1,121):
-    ###print('*********************'+str(energies)+'*********************')
-    ##for kpoints in np.linspace(0,0.5,5):
-        ###print('*********************'+str(kpoints)+'*********************')
-        ##dH.write_delta(final_H_pertb, E = energies, k = [kpoints,0,0])
-##for energies in np.linspace(-2.1,2.1,2001):
-    ###print('*********************'+str(energies)+'*********************')
-    ##dH.write_delta(final_H_pertb, E = energies)
+## kpoint dependent perturbation Hamiltonian
+#for kpoints in np.linspace(0,0.5,21):
+    ##print('*********************'+str(kpoints)+'*********************')
+    #dH.write_delta(final_H_pertb, k = [kpoints,0,0])
+#dH.write_delta(final_H_pertb, k = [0.14285714,0,0])
 
-##for kpoints in np.linspace(0,0.5,21):
-    ###print('*********************'+str(kpoints)+'*********************')
-    ##dH.write_delta(final_H_pertb, k = [kpoints,0,0])
+## Perturbation Hamiltonian without any energy or kpoint dependency
+dH.write_delta(final_H_pertb)
 
-#dH.write_delta(final_H_pertb)
-##dH.write_delta(final_H_pertb, k = [0.14285714,0,0])
+end_final_assign = time.time()
 
-##klist = []
-##for kpoints0 in np.linspace(0,10,1):
-    ##klist = [kpoints0,0,0]
-    ##print('*********************'+str(kpoints0)+'*********************')
-    ##dH.write_delta(final_H_pertb, K = klist)#, K=[0,0,0])
-##print(klist)
-#end_final_assign = time.time()
+print('Total time for the final assignment of 11 the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
 
-#print('Total time for the final assignment of 11 the perturbation Hamiltonian is {}. '.format(end_final_assign-beg_final_assign))
+time_end = time.time()
 
-
-#time_end = time.time()
-
-#print('It takes {} for this script to calcualte, assign, and write the H_perturbation to an external .nc file.'.format(time_end - time_begin))
+print('It takes {} for this script to calcualte, assign, and write the H_perturbation to an external .nc file.'.format(time_end - time_begin))
