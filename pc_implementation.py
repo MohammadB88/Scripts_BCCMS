@@ -14,8 +14,10 @@ import numpy as np
 from scipy import constants, sparse, io
 import time
 
+bias = float(input('Please enter the bias voltage in float format (?.?): '))
+
 time_begin = time.time()
-path_wd = '/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width6/devgeom_constraint_SZP/scat_pristine' # this is the path to the working directory
+path_wd = '/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width1/test_photocurrent/scat_withoutopt_18_SZP/TS{}/'.format(bias) # this is the path to the working directory
 
 # ********************************************************************************
 # assign the constant variables
@@ -113,6 +115,19 @@ print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting
 
 
 # ********************************************************************************
+# Read in the number of atoms in the 1T phase and 2H phase:
+#
+na_2h = int(input('Please enter the number of atoms in the 2H phase (atoms in the scattering region): '))
+na_1t = int(input('Please enter the number of atoms in the 1T phase (atoms not in the scattering region): '))
+
+# At the end, these indices would help to track each step of the perturbation calculating and 
+# finally obtain the final perturbation term. 
+# This leads also to a test to make sure I only add the perturbation to the Hamiltonian elements of the 1st image!
+test_an_1 = na_2h - 1
+test_an_2 = na_2h - 43
+print('These are the indices of the atoms {} and {} which their overlap has non-zero elements in the (perturbation) Hamiltonian.'.format(test_an_1, test_an_2))
+
+# ********************************************************************************
 # DENSITY MATRIX & Mulliken Analysis => A^dagger * A
 #
 # read in and assign the device density matrix using sisl
@@ -139,7 +154,7 @@ zero = 0
 threshold = 0.5   # amount of Mulliken charge to consider an orbital occupied.
 a = []            # A operator => occupied states = 1, unoccupied states = 0
 adagger = []      # A^dagger operator => occupied states = 0, unoccupied states = 1
-for i in range(180*9,180*9+198*9):
+for i in range(na_1t*9,na_1t*9+na_2h*9):
     if M[i,i][0][0] >= threshold:
         a.append(1)
         adagger.append(0) 
@@ -165,13 +180,13 @@ print('adagger[0:10]', adagger[0:10])
 print('a:',np.shape(np.array(a).reshape(1,len(a))),'\nadagger:',np.shape(np.array(adagger).reshape(len(adagger),1)))
 adaggera_value = np.array(adagger).reshape(len(adagger),1).dot(np.array(a).reshape(1,len(a)))
 #print(np.shape(adaggera_value))
-AdaggerA = np.zeros((198*9,198*9,1))
-for l in range(180*9,180*9+198*9):
-    for m in range(180*9,180*9+198*9):
-        if adaggera_value[l-180*9,m-180*9] == 1: 
-            AdaggerA[l-180*9,m-180*9,0] = 1  
+AdaggerA = np.zeros((na_2h*9,na_2h*9,1))
+for l in range(na_1t*9,na_1t*9+na_2h*9):
+    for m in range(na_1t*9,na_1t*9+na_2h*9):
+        if adaggera_value[l-na_1t*9,m-na_1t*9] == 1: 
+            AdaggerA[l-na_1t*9,m-na_1t*9,0] = 1  
         else:
-            AdaggerA[l-180*9,m-180*9,0] = 0  
+            AdaggerA[l-na_1t*9,m-na_1t*9,0] = 0  
 
 
 print('This is a 10x10 sample of the matrix AdaggerA to make sure it is working as expected.')
@@ -195,22 +210,22 @@ H_0 = sisl.Hamiltonian.read('{}/MoS2.fdf'.format(path_wd))
 #print(io, io+0, H_0[io+0,io+0])
 #print(io, io+5022*2+0, H_0[io+0,io+5022*2+0])
 for supercell_number in range(0,9):
-    print(' supercell_number= {} , H_0[180*9+197*9+8,180*9+155*9+3,0] = {} eV'.format(supercell_number, H_0[180*9+197*9+8,180*9+155*9+3+558*9*supercell_number,0]))
+    print(' supercell_number= {} , H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(supercell_number, H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3+558*9*supercell_number,0]))
     
-print('\nH_0[180*9+197*9+8,180*9+155*9+3,0] = {} eV'.format(H_0[180*9+197*9+8,180*9+155*9+3,0]))
+print('\nH_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0]))
 print('shape of the H_0: ',np.shape(H_0))
 
 print('Selecting part of the unperturbed Hamiltonian that belongs to the device region (H_0_lm).')
 
-H_0_lm = np.zeros((198*9,198*9,1))
-for l in range(0,198*9):
-    for m in range(0,198*9):
-        H_0_lm[l,m] = H_0[180*9+l,180*9+m,0]
-#H_0_lm[:,:] = H_0[io:io+198*9,io:io+198*9,0]
-print('H_0_lm[197*9+8,155*9+3,0] = {} eV'.format(H_0_lm[197*9+8,155*9+3,0]))
+H_0_lm = np.zeros((na_2h*9,na_2h*9,1))
+for l in range(0,na_2h*9):
+    for m in range(0,na_2h*9):
+        H_0_lm[l,m] = H_0[na_1t*9+l,na_1t*9+m,0]
+#H_0_lm[:,:] = H_0[io:io+na_2h*9,io:io+na_2h*9,0]
+print('H_0_lm[test_an_1*9+8,test_an_2*9+3,0] = {} eV'.format(H_0_lm[test_an_1*9+8,test_an_2*9+3,0]))
 
-#print(H_0_lm[180*9:180*9+198*9,180*9:180*9+198*9,0])
-if H_0_lm[0,0,0] == H_0[180*9+0,180*9+0,0]:
+#print(H_0_lm[na_1t*9:na_1t*9+na_2h*9,na_1t*9:na_1t*9+na_2h*9,0])
+if H_0_lm[0,0,0] == H_0[na_1t*9+0,na_1t*9+0,0]:
     print('H_0 has been correctly read into the Hamiltonian of device region (H_0_lm).')
     
 print('H_0_lm shape: {}'.format(np.shape(H_0_lm)))
@@ -227,25 +242,25 @@ print('There are {} nonzero elements in matrix H_0_lm. \n'.format(H_0_lm_nonzero
 
 geom = sisl.Geometry.read('{}/MoS2.fdf'.format(path_wd))
 
-orbital_coordinate = np.zeros((198*9,2))
+orbital_coordinate = np.zeros((na_2h*9,2))
 new_i = 0
-for ai in range(0,198): # ai atom index
+for ai in range(0,na_2h): # ai atom index
    for oi in range(0,9): # oi orbital index
-       orbital_coordinate[new_i,0] = H_0.geometry.a2o(180+ai, True)[oi]
+       orbital_coordinate[new_i,0] = H_0.geometry.a2o(na_1t+ai, True)[oi]
        #print(orbital_coordinate[new_i,0])
-       orbital_coordinate[new_i,1] = geom[180+ai,2]
+       orbital_coordinate[new_i,1] = geom[na_1t+ai,2]
        new_i = new_i + 1 # I need this so that these loops iterates and write all the atoms and their coordinate correctly.
        
 #print('Here is a list of orbital indices and their corresponding coordinate: .\n')
 #print(orbital_coordinate)
-#print(geom[180+197,2])
+#print(geom[na_1t+test_an_1,2])
 
-atom_distance = np.zeros((198*9,198*9,1))
-for aoi1 in range(0,198*9): # aoi1 and aoi2 are atom_orbital indices = atom*orbital
-   for aoi2 in range(0,198*9):
+atom_distance = np.zeros((na_2h*9,na_2h*9,1))
+for aoi1 in range(0,na_2h*9): # aoi1 and aoi2 are atom_orbital indices = atom*orbital
+   for aoi2 in range(0,na_2h*9):
        atom_distance[aoi1,aoi2] = (orbital_coordinate[aoi1,1] - orbital_coordinate[aoi2,1])*(10**(-10)) 
 
-print('atom_distance[197*9+8,155*9+3,0] = ' ,atom_distance[197*9+8,155*9+3,0])
+print('atom_distance[test_an_1*9+8,test_an_2*9+3,0] = ' ,atom_distance[test_an_1*9+8,test_an_2*9+3,0])
 print('atom_distance shape: {} '.format(np.shape(atom_distance)))
 atom_distance_nonzero_elm = np.count_nonzero(np.count_nonzero(atom_distance, axis=2))
 print('There are {} nonzero elements in matrix atom_distance. \n'.format(atom_distance_nonzero_elm))
@@ -272,19 +287,19 @@ delta_energy = 1
 
 print('(((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2))= ', (((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2)))
 
-H_perturbation_centr = np.zeros((198*9,198*9,1), dtype=np.complex64)
+H_perturbation_centr = np.zeros((na_2h*9,na_2h*9,1), dtype=np.complex64)
 print('H_perturbation_centr shape before assignment: {}'.format(np.shape(H_perturbation_centr)))
 #print(H_perturbation_centr)
-for l in range(0,198*9):
-    for m in range(0,198*9):
+for l in range(0,na_2h*9):
+    for m in range(0,na_2h*9):
         H_perturbation_centr[l,m,0] = (((1j)* 1)/h_bar) * (((h_bar * math.sqrt(mu_r * epsilon_r) * I_omega)/(2 * N * omega * epsilon * c))**(1/2)) * ((2 * pi_value * N)**(1/2)) * atom_distance[l,m,0] * H_0_lm[l,m,0] * AdaggerA[l,m,0] 
         #if H_perturbation_centr[l,m,0] != 0.0:
             #print(l, m, H_perturbation_centr[l,m,0])
 
 #print(H_perturbation_centr)
-print('H_perturbation_centr[197*9+8,155*9+3,0] = {} eV'.format(H_perturbation_centr[197*9+8,155*9+3,0]))
+print('H_perturbation_centr[test_an_1*9+8,test_an_2*9+3,0] = {} eV'.format(H_perturbation_centr[test_an_1*9+8,test_an_2*9+3,0]))
 
-#print(H_perturbation_centr[180*9:180*9+198*9,180*9:180*9+198*9,0])
+#print(H_perturbation_centr[na_1t*9:na_1t*9+na_2h*9,na_1t*9:na_1t*9+na_2h*9,0])
 #print('\n***** I may have to devide this perturbation by "2" because <l|H_pertb|m> = <m|H_pertb|l>. *****')
 
 H_pertb_device_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation_centr, axis=2))          
@@ -293,24 +308,25 @@ print('There are {} number of non-zero elements in the H_perturbation_centr. \n 
 # ********************************************************************************
 # CALCULATE THE PERTURBATION HAMILTONIAN OF THE WHOLE DEVICE
 # H_perturbation
+# This should only be added to the first image.
 #
 
-H_perturbation = np.zeros(((180*9+198*9+180*9),(180*9+198*9+180*9)*9,1), dtype=np.complex64)
+H_perturbation = np.zeros(((na_1t*9+na_2h*9+na_1t*9),(na_1t*9+na_2h*9+na_1t*9)*9,1))#, dtype=np.complex64)
 #print(np.shape(H_perturbation))
 
-# This is only for the first image. 
-#H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
+ 
+#H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9:na_1t*9+na_2h*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
 # I sould generalize it to include the effect of perturbation on other images.
 #for supercell_number in range(0,9):
-    #print((180*9+558*9*supercell_number)-(180*9+198*9+558*9*supercell_number))
-    #H_perturbation[180*9:180*9+198*9,180*9+558*9*supercell_number:180*9+198*9+558*9*supercell_number,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
+    #print((na_1t*9+558*9*supercell_number)-(na_1t*9+na_2h*9+558*9*supercell_number))
+    #H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9+558*9*supercell_number:na_1t*9+na_2h*9+558*9*supercell_number,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
 
-H_perturbation[180*9:180*9+198*9,180*9:180*9+198*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
+H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9:na_1t*9+na_2h*9,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
 
 for supercell_number in range(0,9):
-    print(' supercell_number= {} , H_perturbation[180*9+197*9+8,180*9+155*9+3,0] = {} eV'.format(supercell_number, H_perturbation[180*9+197*9+8,180*9+155*9+3+558*9*supercell_number,0]))
+    print(' supercell_number= {} , H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(supercell_number, H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3+558*9*supercell_number,0]))
     
-print('\nH_perturbation[180*9+197*9+8,180*9+155*9+3,0] = ' ,H_perturbation[180*9+197*9+8,180*9+155*9+3,0])
+print('\nH_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = ' ,H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0])
 
 H_pertb_nonzero_elm = np.count_nonzero(np.count_nonzero(H_perturbation, axis=2))          
 print('There are {} number of non-zero elements in the H_perturbation. '.format(H_pertb_nonzero_elm))
@@ -341,8 +357,11 @@ print(test_csr)
     #print(final_H_pertb)
     #dH.write_delta(final_H_pertb, E = energies)#, K=[0,0,0])
 
+# Let's jsut assume the general case in which there are no enegy and K dipendency.
+multiE = '' # 'multiE'
+multiK = '' # 'multiK'
 
-dH = sisl.get_sile('deltaH_multiE.dH.nc', 'w')
+dH = sisl.get_sile('deltaH{}{}{}.dH.nc'.format(multiE, multiK, bias), 'w')
 final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
 #print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
 #final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
@@ -352,22 +371,30 @@ final_H_pertb = final_H_pertb.fromsp(fdf.read_geometry(),test_csr)
 print(final_H_pertb)
 
 ## Energy and kpoint dependent perturbation Hamiltonian
-#for energies in np.linspace(-0.1,2.1,121):
+#for energies in np.linspace(-0.1, photon_energy+0.1, 301):
     ##print('*********************'+str(energies)+'*********************')
-    #for kpoints in np.linspace(0,0.5,5):
+    #for kpoints in np.linspace(0, 0.5, 5):
         ##print('*********************'+str(kpoints)+'*********************')
         #dH.write_delta(final_H_pertb, E = energies, k = [kpoints,0,0])
 
-## Energy dependent perturbation Hamiltonian
-#for energies in np.linspace(-2.1,2.1,2001):
-    ##print('*********************'+str(energies)+'*********************')
-    #dH.write_delta(final_H_pertb, E = energies)
+# Energy dependent perturbation Hamiltonian
+#for energies in np.linspace(-0.1, photon_energy+0.1, 311):
+    ###print('*********************'+str(energies)+'*********************')
+    ##dH.write_delta(final_H_pertb, E = energies)
+    #dH.write_delta(final_H_pertb, E = energies, k = [0.0,0,0])
+    #dH.write_delta(final_H_pertb, E = energies, k = [0.028782,0,0])
+    #dH.write_delta(final_H_pertb, E = energies, k = [0.057564,0,0])
+    #dH.write_delta(final_H_pertb, E = energies, k = [0.086346,0,0])
+#dH.write_delta(final_H_pertb, E = -0.27500)
 
 ## kpoint dependent perturbation Hamiltonian
-#for kpoints in np.linspace(0,0.5,21):
+#for kpoints in np.linspace(0,0.5,251):
     ##print('*********************'+str(kpoints)+'*********************')
     #dH.write_delta(final_H_pertb, k = [kpoints,0,0])
-#dH.write_delta(final_H_pertb, k = [0.14285714,0,0])
+#dH.write_delta(final_H_pertb, k = [0.0,0,0])
+#dH.write_delta(final_H_pertb, k = [0.028782,0,0])
+#dH.write_delta(final_H_pertb, k = [0.057564,0,0])
+#dH.write_delta(final_H_pertb, k = [0.086346,0,0])
 
 ## Perturbation Hamiltonian without any energy or kpoint dependency
 dH.write_delta(final_H_pertb)
