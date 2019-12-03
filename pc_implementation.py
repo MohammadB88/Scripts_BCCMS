@@ -17,7 +17,7 @@ import time
 bias = float(input('Please enter the bias voltage in float format (?.?): '))
 
 time_begin = time.time()
-path_wd = '/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width1/test_photocurrent/scat_withoutopt_18_SZP/TS{}/'.format(bias) # this is the path to the working directory
+path_wd = '/mnt/local/mb1988_data/mos2/devices/1t-2h-interface/armchair/arm2/device_width1/test_photocurrent/scat_withoutopt_18_SZP' # this is the path to the working directory
 
 # ********************************************************************************
 # assign the constant variables
@@ -120,6 +120,8 @@ print('Photon flux is equal to {} N_ph/m^2.s, giving {} number of photons hiting
 na_2h = int(input('Please enter the number of atoms in the 2H phase (atoms in the scattering region): '))
 na_1t = int(input('Please enter the number of atoms in the 1T phase (atoms not in the scattering region): '))
 
+tot_na_dev = (2*na_1t) + na_2h # total number of atoms in the device
+
 # At the end, these indices would help to track each step of the perturbation calculating and 
 # finally obtain the final perturbation term. 
 # This leads also to a test to make sure I only add the perturbation to the Hamiltonian elements of the 1st image!
@@ -135,7 +137,7 @@ print('These are the indices of the atoms {} and {} which their overlap has non-
 # A^dagger * A enforces transmitions from occupied to unoccupied orbitals.
 
 print('\nStart reading in the density matrix. \n')
-fdf = sisl.get_sile('{}/MoS2.fdf'.format(path_wd))
+fdf = sisl.get_sile('{}/TS_{}/MoS2.fdf'.format(path_wd,bias))
 DM = fdf.read_density_matrix(order=['TSDE'])
 #print(fdf.read_supercell())
 print('shape of the H_0: ',np.shape(DM))
@@ -203,14 +205,14 @@ print('There are {} ({}x{}) number of nonzero elements in the matrix AdaggerA. '
 #
 
 print('\nStart reading in the unperturbed Hamiltonian (H_0).')
-H_0 = sisl.Hamiltonian.read('{}/MoS2.fdf'.format(path_wd))
+H_0 = sisl.Hamiltonian.read('{}/TS_{}/MoS2.fdf'.format(path_wd,bias))
 
 #print(H_0)
 #io = H_0.geometry.a2o(1) # python is 0-based
 #print(io, io+0, H_0[io+0,io+0])
 #print(io, io+5022*2+0, H_0[io+0,io+5022*2+0])
 for supercell_number in range(0,9):
-    print(' supercell_number= {} , H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(supercell_number, H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3+558*9*supercell_number,0]))
+    print(' supercell_number= {} , H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(supercell_number, H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3+tot_na_dev*9*supercell_number,0]))
     
 print('\nH_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(H_0[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0]))
 print('shape of the H_0: ',np.shape(H_0))
@@ -240,7 +242,7 @@ print('There are {} nonzero elements in matrix H_0_lm. \n'.format(H_0_lm_nonzero
 # I can extend the script so that it could work with any type of polarization.
 # 
 
-geom = sisl.Geometry.read('{}/MoS2.fdf'.format(path_wd))
+geom = sisl.Geometry.read('{}/TS_{}/MoS2.fdf'.format(path_wd,bias))
 
 orbital_coordinate = np.zeros((na_2h*9,2))
 new_i = 0
@@ -318,13 +320,13 @@ H_perturbation = np.zeros(((na_1t*9+na_2h*9+na_1t*9),(na_1t*9+na_2h*9+na_1t*9)*9
 #H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9:na_1t*9+na_2h*9,0] = H_perturbation_centr[:,:,0] #(-1j)*
 # I sould generalize it to include the effect of perturbation on other images.
 #for supercell_number in range(0,9):
-    #print((na_1t*9+558*9*supercell_number)-(na_1t*9+na_2h*9+558*9*supercell_number))
-    #H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9+558*9*supercell_number:na_1t*9+na_2h*9+558*9*supercell_number,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
+    #print((na_1t*9+tot_na_dev*9*supercell_number)-(na_1t*9+na_2h*9+tot_na_dev*9*supercell_number))
+    #H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9+tot_na_dev*9*supercell_number:na_1t*9+na_2h*9+tot_na_dev*9*supercell_number,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
 
 H_perturbation[na_1t*9:na_1t*9+na_2h*9,na_1t*9:na_1t*9+na_2h*9,0] = (-1j)*H_perturbation_centr[:,:,0] #(-1j)*
 
 for supercell_number in range(0,9):
-    print(' supercell_number= {} , H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(supercell_number, H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3+558*9*supercell_number,0]))
+    print(' supercell_number= {} , H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = {} eV'.format(supercell_number, H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3+tot_na_dev*9*supercell_number,0]))
     
 print('\nH_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0] = ' ,H_perturbation[na_1t*9+test_an_1*9+8,na_1t*9+test_an_2*9+3,0])
 
@@ -361,7 +363,7 @@ print(test_csr)
 multiE = '' # 'multiE'
 multiK = '' # 'multiK'
 
-dH = sisl.get_sile('deltaH{}{}{}.dH.nc'.format(multiE, multiK, bias), 'w')
+dH = sisl.get_sile('{}/photocurrent/deltaH{}{}_{}.dH.nc'.format(path_wd,multiE,multiK,bias), 'w')
 final_H_pertb = sisl.Hamiltonian(fdf.read_geometry(), dtype = np.complex128)
 #print(np.shape(H_perturbation[:,0,0].reshape((5022,1))))
 #final_H_pertb = sparse.csr_matrix((H_perturbation[:,:,0].reshape(5022*5022*9,1), (H_perturbation[:,0,0].reshape((5022,1)),H_perturbation[0,:,0].reshape((5022*9,1)))), shape=(5022,5022*9))
