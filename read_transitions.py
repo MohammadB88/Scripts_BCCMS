@@ -48,16 +48,26 @@ for l in range(377*26+62,377*26+63):
 #print(k_eng_full)
 #print(k_eng_empty)
 
+# store the transitions into a file
+output = open('transitions_strain+00.txt', 'w')
+
 print('Transistions at Gamma point: \n')
+output.write('Transistions at Gamma point: \n')
 for idx_empty in range(len(k_eng_empty)):
     for idx_full in range(len(k_eng_full)):
         gamma_delta_eng = abs(gamma_eng_empty[idx_empty]-gamma_eng_full[idx_full])
-        if gamma_delta_eng > 0.70 and gamma_delta_eng < 1.00:
+        if gamma_delta_eng > 0.10 and gamma_delta_eng < 1.00:
             print(gamma_eng_empty[idx_empty], gamma_eng_full[idx_full], gamma_delta_eng)
-            
+            output.write('{}   {}   {}\n'.format(gamma_eng_empty[idx_empty], gamma_eng_full[idx_full], gamma_delta_eng))
+
+output.write('---------------------------------------------------------------------\n')            
 print('Transistions at K point: \n')
+output.write('Transistions at K point: \n')
 for idx_empty in range(len(k_eng_empty)):
     for idx_full in range(len(k_eng_full)):
         k_delta_eng = abs(k_eng_empty[idx_empty]-k_eng_full[idx_full])
-        if k_delta_eng > 0.70 and k_delta_eng < 1.00:
+        if k_delta_eng > 0.10 and k_delta_eng < 1.00:
             print(k_eng_empty[idx_empty], k_eng_full[idx_full], k_delta_eng)
+            output.write('{}   {}   {}\n'.format(k_eng_empty[idx_empty], k_eng_full[idx_full], k_delta_eng))
+
+output.close()
