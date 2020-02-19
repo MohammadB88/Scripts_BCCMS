@@ -7,8 +7,8 @@ import pandas as pd
 from scipy.signal import find_peaks
 import linecache
 
-#PATH = '/mnt/local/mb1988_data/mos2/plot-wavefunction/88-supercell/1mov/D1/strain2.0/wavefunction-coefficient/wavefunction-coefficient.txt'
-PATH = '/mnt/local/mb1988_data/mos2/plot-wavefunction/88-supercell/1mov/strain0.0/wavefunction-coefficient/wavefunction-coefficient.txt'
+PATH = '/mnt/local/mb1988_data/mos2/plot-wavefunction/88-supercell/1mov/D1/strain2.0/wavefunction-coefficient/wavefunction-coefficient.txt'
+#PATH = '/mnt/local/mb1988_data/mos2/plot-wavefunction/88-supercell/1mov/strain0.0/wavefunction-coefficient/wavefunction-coefficient.txt'
 
 #line = linecache.getline(PATH,12+3377).rstrip().split()
 #linecache.clearcache()
@@ -34,7 +34,7 @@ print(idx_bands)
 atom_idx = [37,38,45,46,53,54,91,99,100,155,163,164]
 
 # Read the orbitals of atoms around the vacancy involved the above DLs
-output = open('required_wfs_strain00.txt', 'w')
+output = open('required_wfs_strain+20.txt', 'w')
 with open(PATH, 'r') as fh:
     line = fh.readlines()
     print(len(idx_bands))
@@ -43,7 +43,7 @@ with open(PATH, 'r') as fh:
         output.write(line[idx_bands[i]-1])
         output.write(line[idx_bands[i]])
         output.write('-----------------------------------------------------------------------\n')
-        for j in range(idx_bands[i]+300,idx_bands[i]+3000):
+        for j in range(idx_bands[i]+10,idx_bands[i]+3000):
             words = line[j].rstrip().split()
             if '-----------------------------------------------------------------------' in words:
                 break
