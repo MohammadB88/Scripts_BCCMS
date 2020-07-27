@@ -10,6 +10,16 @@ import linecache
 
 
 num_kpoins = 360
+
+# number of considered bands for ML: 15, for bulk: 21
+num_bands = 21 
+
+# fermi level for ML: -4.3487, for bulk: -3.2951453224165num_bands0
+fermi_level = -3.2951453224165150
+
+# ylimit for ML: y_min, y_max = -4, 4 ||| for bulk: y_min, y_max = -4, 4
+y_min, y_max = -4, 4
+
 # read bs and PDOS from Mo orbitals
 bs_Mo = './Mo_4d.dat'
 bs_data_Mo = np.loadtxt(bs_Mo, skiprows=3, unpack=True)
@@ -49,7 +59,7 @@ ax1.set_xticks([0.0, 0.701543, 1.052315, 1.652]) #1.666106
 ax1.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=38, style='oblique')
 ax1.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=34)
 ax1.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=22)
-ax1.set_ylim(-4,4)
+ax1.set_ylim(y_min, y_max)
 ax1.set_ylabel('Energy (eV)', fontsize = 38)
 ax1.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=34)
 ax1.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=22)
@@ -61,7 +71,7 @@ ax2.set_xticks([0.0, 0.701543, 1.052315, 1.652]) #1.666106
 ax2.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=38, style='oblique')
 ax2.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=34)
 ax2.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=22)
-ax2.set_ylim(-4,4)
+ax2.set_ylim(y_min, y_max)
 #ax2.set_ylabel('Energy (eV)', fontsize = 38)
 ax2.tick_params(axis='y', which='major', width=2.00, length=5.0, labelleft=False, labelsize=34)
 ax2.tick_params(axis='y', which='minor', width=2.00, length=5.0, labelleft=False, labelsize=22)
@@ -74,10 +84,10 @@ inp_orbs = [bs_data_dx2y2, bs_data_dxy, bs_data_dxz, bs_data_dyz, bs_data_dz2,
 # ************************************************************************
 # BS as base and three sets of plots to include Mo orbitals in the left plot 
 # *********************  dxy+dx2y2   *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[0][0,0+step:num_kpoins+step]
-    y = inp_orbs[0][1,0+step:num_kpoins+step] + 4.3487
+    y = inp_orbs[0][1,0+step:num_kpoins+step] + (-1) * fermi_level
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -94,10 +104,10 @@ for i in range(15):
     ax1.add_collection(lc)
     ax1.autoscale_view(True,True,True)
 # *********************  dxz+dyz   *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[2][0,0+step:num_kpoins+step]
-    y = inp_orbs[2][1,0+step:num_kpoins+step] + 4.3487 
+    y = inp_orbs[2][1,0+step:num_kpoins+step] + -fermi_level 
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -113,10 +123,10 @@ for i in range(15):
     ax1.add_collection(lc)
     ax1.autoscale_view(True,True,True)
 # *********************   dz2    *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[4][0,0+step:num_kpoins+step]
-    y = inp_orbs[4][1,0+step:num_kpoins+step] + 4.3487
+    y = inp_orbs[4][1,0+step:num_kpoins+step] + -fermi_level
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -132,10 +142,10 @@ for i in range(15):
     ax1.add_collection(lc)
     ax1.autoscale_view(True,True,True)
 # ********************* plot bs as base for the plot *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = bs_data_Mo[0,0+step:num_kpoins+step]
-    y = bs_data_Mo[1,0+step:num_kpoins+step] + 4.3487
+    y = bs_data_Mo[1,0+step:num_kpoins+step] + -fermi_level
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -150,10 +160,10 @@ for i in range(15):
 # ************************************************************************
 # BS as base and two sets of plots to include S orbitals in the right plot 
 # *********************   px+py   *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[5][0,0+step:num_kpoins+step]
-    y = inp_orbs[5][1,0+step:num_kpoins+step] + 4.3487 
+    y = inp_orbs[5][1,0+step:num_kpoins+step] + -fermi_level 
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -168,10 +178,10 @@ for i in range(15):
     ax2.add_collection(lc)
     ax2.autoscale_view(True,True,True)
 # *********************   pz   *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[7][0,0+step:num_kpoins+step]
-    y = inp_orbs[7][1,0+step:num_kpoins+step] + 4.3487 
+    y = inp_orbs[7][1,0+step:num_kpoins+step] + -fermi_level 
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -186,10 +196,10 @@ for i in range(15):
     ax2.add_collection(lc)
     ax2.autoscale_view(True,True,True)
 # ********************* plot bs as base for the plot *********************
-for i in range(15):
+for i in range(num_bands):
     step = i*num_kpoins
     x = bs_data_S[0,0+step:num_kpoins+step]
-    y = bs_data_S[1,0+step:num_kpoins+step] + 4.3487
+    y = bs_data_S[1,0+step:num_kpoins+step] + -fermi_level
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
@@ -206,7 +216,7 @@ ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3, fancybox=True
 ax2.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=2, fancybox=True, shadow=True, fontsize = 32)
 plt.subplots_adjust(right=1.00, left=0.0, wspace=0.00, hspace=0.0) #bottom=0.0, top=1.3, 
 plt.tight_layout()
-plt.savefig('./bs_pdos_ml.png')
+plt.savefig('./bs_pdos_bulk.png')
 plt.show()
 inp = input('press 1: ')
 if inp == '1':
