@@ -10,15 +10,15 @@ import linecache
 
 
 #fig, ax = plt.subplots(ncols=3, figsize=(20, 10), squeeze=True)
-
+num_kpoins = 360
 # read bs and PDOS from Mo orbitals
 bs_Mo = './Mo_4d.dat'
 bs_data_Mo = np.loadtxt(bs_Mo, skiprows=3, unpack=True)
 print(len(bs_data_Mo), len(bs_data_Mo[0]))
 print(type(bs_data_Mo[2]))
 print(bs_data_Mo[2].size)
-#print(bs_data_Mo[0,0:90])
-#print(bs_data_Mo[1,0:90])
+#print(bs_data_Mo[0,0:num_kpoins])
+#print(bs_data_Mo[1,0:num_kpoins])
 
 bs_dx2y2 = './Mo_4dx2-y2.dat'
 bs_data_dx2y2 = np.loadtxt(bs_dx2y2, skiprows=3, unpack=True)
@@ -42,9 +42,24 @@ bs_pz = './S_3pz.dat'
 bs_data_pz = np.loadtxt(bs_pz, skiprows=3, unpack=True)
 
 
-fig, a = plt.subplots()
-a.set_xlim(0,1.65)
-a.set_ylim(-8,-0.2)
+fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(20, 10), squeeze=True)
+
+ax1.set_xlim(0,1.666106)
+ax1.set_xticks([0.0, 0.701543, 1.052315, 1.666106])
+ax1.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=26, style='oblique')
+ax1.set_ylim(-4,4)
+ax1.set_ylabel('Energy (eV)', fontsize = 28)
+ax1.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=26)
+ax1.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14)
+
+
+ax2.set_xlim(0,1.666106)
+ax2.set_xticks([0.0, 0.701543, 1.052315, 1.666106])
+ax2.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=26, style='oblique')
+ax2.set_ylim(-4,4)
+#ax2.set_ylabel('Energy (eV)', fontsize = 28)
+ax2.tick_params(axis='y', which='major', labelleft=False, labelsize=26)
+ax2.tick_params(axis='y', which='minor', labelleft=False, labelsize=14)
 
 #inp_orbs = [(bs_data_Mo, 'black'), (bs_data_dx2y2, 'blue'), bs_data_dxy, bs_data_dxz, bs_data_dyz, bs_data_dz2, bs_data_S, bs_data_px, bs_data_py, bs_data_pz]    
 inp_orbs = [bs_data_dx2y2, bs_data_dxy, bs_data_dxz, bs_data_dyz, bs_data_dz2,
@@ -52,123 +67,140 @@ inp_orbs = [bs_data_dx2y2, bs_data_dxy, bs_data_dxz, bs_data_dyz, bs_data_dz2,
 
 # ************************************************************************
 # BS as base and three sets of plots to include Mo orbitals in the left plot 
-# plot bs as base for the plot
-for i in range(15):
-    step = i*90
-    x = bs_data_Mo[0,0+step:90+step]
-    y = bs_data_Mo[1,0+step:90+step]
-    #print(x)
-    #print(y)
-    lwidths=1+x[:-1]
-    points = np.array([x, y]).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    #print(segments, segments.shape)
-    #lwidths = bs_data_Mo[2,0+step:90+step]
-    lc = LineCollection(segments, linewidth=2, color='black')
-    #fig, a = plt.subplots()
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
-
 # *********************  dxy+dx2y2   *********************
 for i in range(15):
-    step = i*90
-    x = inp_orbs[0][0,0+step:90+step]
-    y = inp_orbs[0][1,0+step:90+step] 
+    step = i*num_kpoins
+    x = inp_orbs[0][0,0+step:num_kpoins+step]
+    y = inp_orbs[0][1,0+step:num_kpoins+step] + 4.3487
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
-    lwidths = inp_orbs[0][2,0+step:90+step] + inp_orbs[1][2,0+step:90+step] 
-    lc = LineCollection(segments, linewidth=20*lwidths, color='red')
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
+    lwidths = inp_orbs[0][2,0+step:num_kpoins+step] + inp_orbs[1][2,0+step:num_kpoins+step] 
+    #lc = LineCollection(segments, linewidth=15*lwidths, color='red', label=r'$d_{xy} + d_{x^2 + y^2}$')
+    if i == 4:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='red', label=r'$d_{xy} + d_{x^2 + y^2}$')
+    else:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='red')
+    ax1.add_collection(lc)
+    ax1.autoscale_view(True,True,True)
 # *********************  dxz+dyz   *********************
 for i in range(15):
-    step = i*90
-    x = inp_orbs[2][0,0+step:90+step]
-    y = inp_orbs[2][1,0+step:90+step] 
+    step = i*num_kpoins
+    x = inp_orbs[2][0,0+step:num_kpoins+step]
+    y = inp_orbs[2][1,0+step:num_kpoins+step] + 4.3487 
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
-    lwidths = inp_orbs[2][2,0+step:90+step] + inp_orbs[3][2,0+step:90+step] 
-    lc = LineCollection(segments, linewidth=20*lwidths, color='green')
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
+    lwidths = inp_orbs[2][2,0+step:num_kpoins+step] + inp_orbs[3][2,0+step:num_kpoins+step] 
+    #lc = LineCollection(segments, linewidth=15*lwidths, color='green', label=r'$d_{xz} + d_{yz}$')
+    if i == 6:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='green', label=r'$d_{xz} + d_{yz}$')
+    else:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='green')
+    ax1.add_collection(lc)
+    ax1.autoscale_view(True,True,True)
 # *********************   dz2    *********************
 for i in range(15):
-    step = i*90
-    x = inp_orbs[4][0,0+step:90+step]
-    y = inp_orbs[4][1,0+step:90+step]
+    step = i*num_kpoins
+    x = inp_orbs[4][0,0+step:num_kpoins+step]
+    y = inp_orbs[4][1,0+step:num_kpoins+step] + 4.3487
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
-    lwidths = inp_orbs[4][2,0+step:90+step]
-    lc = LineCollection(segments, linewidth=20*lwidths, color='blue')
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
-
+    lwidths = inp_orbs[4][2,0+step:num_kpoins+step]
+    #lc = LineCollection(segments, linewidth=15*lwidths, color='blue', label=r'$d_{z^2}$')
+    if i == 8:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='blue', label=r'$d_{z^2}$')
+    else:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='blue')
+    ax1.add_collection(lc)
+    ax1.autoscale_view(True,True,True)
+# ********************* plot bs as base for the plot *********************
+for i in range(15):
+    step = i*num_kpoins
+    x = bs_data_Mo[0,0+step:num_kpoins+step]
+    y = bs_data_Mo[1,0+step:num_kpoins+step] + 4.3487
+    #print(x)
+    #print(y)
+    lwidths=1+x[:-1]
+    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    #print(segments, segments.shape)
+    #lwidths = bs_data_Mo[2,0+step:num_kpoins+step]
+    lc = LineCollection(segments, linewidth=2, color='black')
+    ax1.add_collection(lc)
+    ax1.autoscale_view(True,True,True)
+    
 # ************************************************************************
 # BS as base and two sets of plots to include S orbitals in the right plot 
-# plot bs as base for the plot
-for i in range(15):
-    step = i*90
-    x = bs_data_S[0,0+step:90+step]
-    y = bs_data_S[1,0+step:90+step]
-    #print(x)
-    #print(y)
-    lwidths=1+x[:-1]
-    points = np.array([x, y]).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    #print(segments, segments.shape)
-    #lwidths = bs_data_S[2,0+step:90+step]
-    lc = LineCollection(segments, linewidth=2, color='black')
-    #fig, a = plt.subplots()
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
-
 # *********************   px+py   *********************
 for i in range(15):
-    step = i*90
-    x = inp_orbs[0][0,0+step:90+step]
-    y = inp_orbs[0][1,0+step:90+step] 
+    step = i*num_kpoins
+    x = inp_orbs[5][0,0+step:num_kpoins+step]
+    y = inp_orbs[5][1,0+step:num_kpoins+step] + 4.3487 
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
-    lwidths = inp_orbs[0][2,0+step:90+step] + inp_orbs[1][2,0+step:90+step] 
-    lc = LineCollection(segments, linewidth=20*lwidths, color='red')
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
+    lwidths = inp_orbs[5][2,0+step:num_kpoins+step] + inp_orbs[6][2,0+step:num_kpoins+step] 
+    if i == 11:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='green', label=r'$p_x + p_y$')
+    else:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='green')
+    ax2.add_collection(lc)
+    ax2.autoscale_view(True,True,True)
 # *********************   pz   *********************
 for i in range(15):
-    step = i*90
-    x = inp_orbs[2][0,0+step:90+step]
-    y = inp_orbs[2][1,0+step:90+step] 
+    step = i*num_kpoins
+    x = inp_orbs[7][0,0+step:num_kpoins+step]
+    y = inp_orbs[7][1,0+step:num_kpoins+step] + 4.3487 
     #print(x)
     #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
-    lwidths = inp_orbs[2][2,0+step:90+step] + inp_orbs[3][2,0+step:90+step] 
-    lc = LineCollection(segments, linewidth=20*lwidths, color='green')
-    a.add_collection(lc)
-    a.autoscale_view(True,True,True)
+    lwidths = inp_orbs[7][2,0+step:num_kpoins+step]
+    if i == 2:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='orange', label=r'$p_z$')
+    else:
+        lc = LineCollection(segments, linewidth=15*lwidths, color='orange')
+    ax2.add_collection(lc)
+    ax2.autoscale_view(True,True,True)
+# ********************* plot bs as base for the plot *********************
+for i in range(15):
+    step = i*num_kpoins
+    x = bs_data_S[0,0+step:num_kpoins+step]
+    y = bs_data_S[1,0+step:num_kpoins+step] + 4.3487
+    #print(x)
+    #print(y)
+    lwidths=1+x[:-1]
+    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    #print(segments, segments.shape)
+    #lwidths = bs_data_S[2,0+step:num_kpoins+step]
+    lc = LineCollection(segments, linewidth=1, color='black')
+    ax2.add_collection(lc)
+    ax2.autoscale_view(True,True,True)
 
-
-
-plt.show()
+#(lc1, lc2, lc3), (r'$d_{xy} + d_{x^2 + y^2}$', r'$d_{xz} + d_{yz}$', r'$d_{z^2}$')
+ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), ncol=3, fancybox=True, shadow=True, fontsize = 19)
+ax2.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), ncol=2, fancybox=True, shadow=True, fontsize = 19)
+plt.subplots_adjust(right=0.98, wspace=0.00, hspace=0.0) #bottom=0.0, top=1.3, 
+plt.tight_layout()
 plt.savefig('./fatbands_test.png')
+plt.show()
 inp = input('press 1: ')
 if inp == '1':
     print('finished')
@@ -177,4 +209,3 @@ if inp == '1':
 #plt.fill_between(0.048132, pdos_engs+2, pdos_engs-2, color='red', alpha=0.5)
 #plt.savefig('./compar_strains_1mov.png')
 #fig.show()
-
