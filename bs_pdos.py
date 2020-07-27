@@ -9,7 +9,6 @@ import pandas as pd
 import linecache
 
 
-#fig, ax = plt.subplots(ncols=3, figsize=(20, 10), squeeze=True)
 num_kpoins = 360
 # read bs and PDOS from Mo orbitals
 bs_Mo = './Mo_4d.dat'
@@ -44,22 +43,29 @@ bs_data_pz = np.loadtxt(bs_pz, skiprows=3, unpack=True)
 
 fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(20, 10), squeeze=True)
 
-ax1.set_xlim(0,1.666106)
-ax1.set_xticks([0.0, 0.701543, 1.052315, 1.666106])
-ax1.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=26, style='oblique')
+# Set the properties for the left plot
+ax1.set_xlim(0,1.652) #1.666106
+ax1.set_xticks([0.0, 0.701543, 1.052315, 1.652]) #1.666106
+ax1.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=38, style='oblique')
+ax1.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=34)
+ax1.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=22)
 ax1.set_ylim(-4,4)
-ax1.set_ylabel('Energy (eV)', fontsize = 28)
-ax1.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=26)
-ax1.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14)
+ax1.set_ylabel('Energy (eV)', fontsize = 38)
+ax1.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=34)
+ax1.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=22)
+#ax1.set_aspect(0.1)
 
-
-ax2.set_xlim(0,1.666106)
-ax2.set_xticks([0.0, 0.701543, 1.052315, 1.666106])
-ax2.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=26, style='oblique')
+# Set the properties for the right plot
+ax2.set_xlim(0,1.652)#1.666106
+ax2.set_xticks([0.0, 0.701543, 1.052315, 1.652]) #1.666106
+ax2.set_xticklabels((r'$\Gamma$', 'K', 'M', r'$\Gamma$'), size=38, style='oblique')
+ax2.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=34)
+ax2.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=22)
 ax2.set_ylim(-4,4)
-#ax2.set_ylabel('Energy (eV)', fontsize = 28)
-ax2.tick_params(axis='y', which='major', labelleft=False, labelsize=26)
-ax2.tick_params(axis='y', which='minor', labelleft=False, labelsize=14)
+#ax2.set_ylabel('Energy (eV)', fontsize = 38)
+ax2.tick_params(axis='y', which='major', width=2.00, length=5.0, labelleft=False, labelsize=34)
+ax2.tick_params(axis='y', which='minor', width=2.00, length=5.0, labelleft=False, labelsize=22)
+#ax2.set_aspect(0.1)
 
 #inp_orbs = [(bs_data_Mo, 'black'), (bs_data_dx2y2, 'blue'), bs_data_dxy, bs_data_dxz, bs_data_dyz, bs_data_dz2, bs_data_S, bs_data_px, bs_data_py, bs_data_pz]    
 inp_orbs = [bs_data_dx2y2, bs_data_dxy, bs_data_dxz, bs_data_dyz, bs_data_dz2,
@@ -76,14 +82,15 @@ for i in range(15):
     #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
+    #print(points.shape)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    #print(segments, segments.shape)
+    #print(segments.shape)
     lwidths = inp_orbs[0][2,0+step:num_kpoins+step] + inp_orbs[1][2,0+step:num_kpoins+step] 
-    #lc = LineCollection(segments, linewidth=15*lwidths, color='red', label=r'$d_{xy} + d_{x^2 + y^2}$')
+    #lc = LineCollection(segments, linewidth=25*lwidths, color='red', label=r'$d_{xy} + d_{x^2 + y^2}$')
     if i == 4:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='red', label=r'$d_{xy} + d_{x^2 + y^2}$')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='red', label=r'$d_{xy} + d_{x^2 + y^2}$')
     else:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='red')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='red')
     ax1.add_collection(lc)
     ax1.autoscale_view(True,True,True)
 # *********************  dxz+dyz   *********************
@@ -98,11 +105,11 @@ for i in range(15):
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
     lwidths = inp_orbs[2][2,0+step:num_kpoins+step] + inp_orbs[3][2,0+step:num_kpoins+step] 
-    #lc = LineCollection(segments, linewidth=15*lwidths, color='green', label=r'$d_{xz} + d_{yz}$')
+    #lc = LineCollection(segments, linewidth=25*lwidths, color='green', label=r'$d_{xz} + d_{yz}$')
     if i == 6:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='green', label=r'$d_{xz} + d_{yz}$')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='green', label=r'$d_{xz} + d_{yz}$')
     else:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='green')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='green')
     ax1.add_collection(lc)
     ax1.autoscale_view(True,True,True)
 # *********************   dz2    *********************
@@ -117,11 +124,11 @@ for i in range(15):
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
     lwidths = inp_orbs[4][2,0+step:num_kpoins+step]
-    #lc = LineCollection(segments, linewidth=15*lwidths, color='blue', label=r'$d_{z^2}$')
+    #lc = LineCollection(segments, linewidth=25*lwidths, color='blue', label=r'$d_{z^2}$')
     if i == 8:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='blue', label=r'$d_{z^2}$')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='blue', label=r'$d_{z^2}$')
     else:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='blue')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='blue')
     ax1.add_collection(lc)
     ax1.autoscale_view(True,True,True)
 # ********************* plot bs as base for the plot *********************
@@ -155,9 +162,9 @@ for i in range(15):
     #print(segments, segments.shape)
     lwidths = inp_orbs[5][2,0+step:num_kpoins+step] + inp_orbs[6][2,0+step:num_kpoins+step] 
     if i == 11:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='green', label=r'$p_x + p_y$')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='indianred', label=r'$p_x + p_y$')
     else:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='green')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='indianred')
     ax2.add_collection(lc)
     ax2.autoscale_view(True,True,True)
 # *********************   pz   *********************
@@ -173,9 +180,9 @@ for i in range(15):
     #print(segments, segments.shape)
     lwidths = inp_orbs[7][2,0+step:num_kpoins+step]
     if i == 2:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='orange', label=r'$p_z$')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='steelblue', label=r'$p_z$')
     else:
-        lc = LineCollection(segments, linewidth=15*lwidths, color='orange')
+        lc = LineCollection(segments, linewidth=25*lwidths, color='steelblue')
     ax2.add_collection(lc)
     ax2.autoscale_view(True,True,True)
 # ********************* plot bs as base for the plot *********************
@@ -190,16 +197,16 @@ for i in range(15):
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     #print(segments, segments.shape)
     #lwidths = bs_data_S[2,0+step:num_kpoins+step]
-    lc = LineCollection(segments, linewidth=1, color='black')
+    lc = LineCollection(segments, linewidth=3, color='black')
     ax2.add_collection(lc)
     ax2.autoscale_view(True,True,True)
 
 #(lc1, lc2, lc3), (r'$d_{xy} + d_{x^2 + y^2}$', r'$d_{xz} + d_{yz}$', r'$d_{z^2}$')
-ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), ncol=3, fancybox=True, shadow=True, fontsize = 19)
-ax2.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), ncol=2, fancybox=True, shadow=True, fontsize = 19)
-plt.subplots_adjust(right=0.98, wspace=0.00, hspace=0.0) #bottom=0.0, top=1.3, 
+ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=3, fancybox=True, shadow=True, fontsize = 32)
+ax2.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), ncol=2, fancybox=True, shadow=True, fontsize = 32)
+plt.subplots_adjust(right=1.00, left=0.0, wspace=0.00, hspace=0.0) #bottom=0.0, top=1.3, 
 plt.tight_layout()
-plt.savefig('./fatbands_test.png')
+plt.savefig('./bs_pdos_ml.png')
 plt.show()
 inp = input('press 1: ')
 if inp == '1':
@@ -209,3 +216,4 @@ if inp == '1':
 #plt.fill_between(0.048132, pdos_engs+2, pdos_engs-2, color='red', alpha=0.5)
 #plt.savefig('./compar_strains_1mov.png')
 #fig.show()
+
