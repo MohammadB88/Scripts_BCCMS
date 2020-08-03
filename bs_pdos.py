@@ -88,8 +88,6 @@ for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[0][0,0+step:num_kpoins+step]
     y = inp_orbs[0][1,0+step:num_kpoins+step] + (-1) * fermi_level
-    #print(x)
-    #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     #print(points.shape)
@@ -108,8 +106,6 @@ for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[2][0,0+step:num_kpoins+step]
     y = inp_orbs[2][1,0+step:num_kpoins+step] + -fermi_level 
-    #print(x)
-    #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -127,8 +123,6 @@ for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[4][0,0+step:num_kpoins+step]
     y = inp_orbs[4][1,0+step:num_kpoins+step] + -fermi_level
-    #print(x)
-    #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -164,8 +158,6 @@ for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[5][0,0+step:num_kpoins+step]
     y = inp_orbs[5][1,0+step:num_kpoins+step] + -fermi_level 
-    #print(x)
-    #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -182,8 +174,6 @@ for i in range(num_bands):
     step = i*num_kpoins
     x = inp_orbs[7][0,0+step:num_kpoins+step]
     y = inp_orbs[7][1,0+step:num_kpoins+step] + -fermi_level 
-    #print(x)
-    #print(y)
     lwidths=1+x[:-1]
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -218,12 +208,4 @@ plt.subplots_adjust(right=1.00, left=0.0, wspace=0.00, hspace=0.0) #bottom=0.0, 
 plt.tight_layout()
 plt.savefig('./bs_pdos_bulk.png')
 plt.show()
-inp = input('press 1: ')
-if inp == '1':
-    print('finished')
-    
-#plt.plot(symmetryline, band_engs, color='black')
-#plt.fill_between(0.048132, pdos_engs+2, pdos_engs-2, color='red', alpha=0.5)
-#plt.savefig('./compar_strains_1mov.png')
-#fig.show()
 
