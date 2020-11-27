@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.ticker import ScalarFormatter
 
-import glob # matches filenames and directories knowing some part of the name
+#import glob # matches filenames and directories knowing some part of the name
 import numpy as np
 
 direc = ['TS_0.00/', 'TS_1.40/']
@@ -39,8 +39,10 @@ ax2.set_title("Bias 1.40 eV", fontsize=20, loc='center', pad=-25.0)
 # read in and plot the pdos for TS_0.00
 for vacancy,label in zip(lst_vacancies,lst_labels):
     #print(vacancy, label)
-    print('PRINT',glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0])))
-    f_l = np.loadtxt(glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]))[0], unpack=True)
+    #print('PRINT',glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0])))
+    #f_l = np.loadtxt(glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]))[0], unpack=True)
+    print('PRINT', '{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]))
+    f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]), unpack=True)
     ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
 
 #ax2.set_xlim(-2.0,2.0)
@@ -63,8 +65,10 @@ for vacancy,label in zip(lst_vacancies,lst_labels):
 # read in and plot the pdos for TS_1.40
 for vacancy,label in zip(lst_vacancies,lst_labels):
     #print(vacancy, label)
-    print('PRINT',glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1])))
-    f_l = np.loadtxt(glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]))[0], unpack=True)
+    #print('PRINT',glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1])))
+    #f_l = np.loadtxt(glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]))[0], unpack=True)
+    print('PRINT', '{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]))
+    f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]), unpack=True)
     ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
 
 # Hide x labels and tick labels for top plots and y ticks for right plots.
