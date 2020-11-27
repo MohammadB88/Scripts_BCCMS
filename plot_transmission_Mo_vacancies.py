@@ -2,50 +2,90 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.ticker import ScalarFormatter
 
+#import glob # matches filenames and directories knowing some part of the name
 import numpy as np
 
-# read in the IV inputs
-f_pristine = np.loadtxt('pristine/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
-f_s = np.loadtxt('int_LR_v_s/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
-f_2stop = np.loadtxt('int_LR_v_2stop/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
-f_2spar = np.loadtxt('int_LR_v_2spar/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
-f_mo = np.loadtxt('int_LR_v_mo/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
-f_mo3s = np.loadtxt('int_LR_v_mo3s/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
-f_mo6s = np.loadtxt('int_LR_v_mo6s/MoS2_dev.TBT.AVTRANS_Left-Right', unpack=True)
+direc = ['TS_0.00/', 'TS_1.40/']
+
+#layer = [2]
+
+lst_vacancies = ['pristine', 'int_LR_v_mo', 'int_LR_v_mo3s', 'int_LR_v_mo6s']
+lst_labels = ['Pristine', '$V_{Mo}$', '$V_{Mo3s}$', '$V_{Mo6s}$']
 
 # parameters for the plot
-fig = plt.figure(figsize=[20, 12])
-plt.xlim(-2.0, 2.0)
-plt.xlabel('Energy (eV)', fontsize=20)
-plt.ylim(0.0, 3.5)
-plt.ylabel('Transmission', fontsize=20) #($10^{-10}$)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10), squeeze=True)
 
-#plt.xticks(np.range(0.0,1.51, step=0.1)
+# Set labels, tick labels, parameters for all plots.
+for ax in (ax1,ax2):
+    ax.set_xlim(-2.0,2.0)
+    ax.set_xlabel('Energy (eV)', fontsize=20)
+    ax.set_ylim(0, 3.5)
+    ax.set_ylabel('Transmission', fontsize=20) #($10^{-10}$)
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20)
+    ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
+    ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14)
+    ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+    ax.yaxis.offsetText.set_fontsize(20)
+    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+    #ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
 
-plt.axes().xaxis.set_major_locator(ticker.MultipleLocator(0.4))
-plt.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20)
-plt.axes().xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
-plt.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14)
-plt.axes().yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
-plt.axes().yaxis.offsetText.set_fontsize(20)
-plt.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
-#plt.axes().yaxis.set_major_locator(ticker.MultipleLocator(0.2))
-plt.axes().yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-plt.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+ax1.set_title("Bias 0.00 eV", fontsize=20, loc='center', pad=-25.0)
+ax2.set_title("Bias 1.40 eV", fontsize=20, loc='center', pad=-25.0)
 
 
-# plot the IV curves
-#scale_factor = 1e10
-#print(scale_factor)
-plt.plot(f_pristine[0], f_pristine[1], color='black', label='pristine')
-#plt.plot(f_s[0], f_s[1], color='blue', label='$V_{S}$')
-#plt.plot(f_2stop[0], f_2stop[1], color='red', label='$V_{2Stop}$')
-#plt.plot(f_2spar[0], f_2spar[1], color='green', label='$V_{2Spar}$')
-plt.plot(f_mo[0], f_mo[1], color='magenta', label='$V_{Mo}$')
-plt.plot(f_mo3s[0], f_mo3s[1], color='cyan', label='$V_{Mo+3S}$')
-plt.plot(f_mo6s[0], f_mo6s[1], color='orange', label='$V_{Mo+6s}$')
 
-plt.legend(fontsize=23, loc='upper right')
-plt.savefig('comparision_transmission_Mo_vacancies.png')
+# read in and plot the pdos for TS_0.00
+for vacancy,label in zip(lst_vacancies,lst_labels):
+    #print(vacancy, label)
+    #print('PRINT',glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0])))
+    #f_l = np.loadtxt(glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]))[0], unpack=True)
+    print('PRINT', '{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]))
+    f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]), unpack=True)
+    ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
+
+#ax2.set_xlim(-2.0,2.0)
+#ax2.set_xlabel('Energy (eV)', fontsize=20)
+#ax2.set_ylim(0, 100)
+#ax2.set_ylabel('Projected DOS', fontsize=20) #($10^{-10}$)
+#ax2.set_title("Bias 1.40 eV", fontsize=20, loc='center', pad=-25.0)
+
+#ax2.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
+#ax2.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20)
+#ax2.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
+#ax2.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14)
+#ax2.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+#ax2.yaxis.offsetText.set_fontsize(20)
+#ax2.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+##ax2.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+#ax2.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+#ax2.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+
+# read in and plot the pdos for TS_1.40
+for vacancy,label in zip(lst_vacancies,lst_labels):
+    #print(vacancy, label)
+    #print('PRINT',glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1])))
+    #f_l = np.loadtxt(glob.glob('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]))[0], unpack=True)
+    print('PRINT', '{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]))
+    f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]), unpack=True)
+    ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
+
+# Hide x labels and tick labels for top plots and y ticks for right plots.
+for ax in (ax1,ax2):
+    ax.label_outer()
+
+
+handles, labels = ax1.get_legend_handles_labels()
+
+fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol=4, fancybox=True, shadow=True, fontsize=20)
+
+#fig.text(0.5, 0.92, 'Projected DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
+
+plt.subplots_adjust(right=1.00, wspace=0.00, hspace=0.0, bottom=0.0, top=0.005)
+plt.tight_layout()
+
+plt.savefig('transmission_Mo_vacancies.png')
 
 plt.show()
