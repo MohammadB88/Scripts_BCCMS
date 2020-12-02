@@ -7,21 +7,29 @@ from scipy import sparse
 tbt = sisl.get_sile('MoS2_dev.TBT.nc')
 
 dr = './vec_cur'
-biass = [-1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.4, 1.5]
-#biass = [-1.5, -1.0, -0.5, 0.0, 0.5, 1.4] 
+energies = [-1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5] 
 
-for bias in biass:
-    J = tbt.vector_current('Left', bias, only='+')
-    print(J[400, :]) 
-    np.savetxt("{}/EV_{}_pos.txt".format(dr, bias), J)
+for eng in energies:
+    # read in and write the vector currents from Left to the Right electrode
+    J = tbt.vector_current('Left', eng, only='+')
+    np.savetxt("{}/Left_{}_pos.txt".format(dr, eng), J)
 
-    J = tbt.vector_current('Left', bias, only='-')
-    print(J[400, :]) 
-    np.savetxt("{}/EV_{}_neg.txt".format(dr, bias), J)
+    J = tbt.vector_current('Left', eng, only='-')
+    np.savetxt("{}/Left_{}_neg.txt".format(dr, eng), J)
 
-    J = tbt.vector_current('Left', bias, only='all')
+    J = tbt.vector_current('Left', eng, only='all')
+    np.savetxt("{}/Left_{}_all.txt".format(dr, eng), J)
     print(J[400, :]) 
-    np.savetxt("{}/EV_{}_all.txt".format(dr, bias), J)
+    # read in and write the vector currents from Right to the Left electrode
+    J = tbt.vector_current('Right', eng, only='+')
+    np.savetxt("{}/Right_{}_pos.txt".format(dr, eng), J)
+
+    J = tbt.vector_current('Right', eng, only='-')
+    np.savetxt("{}/Right_{}_neg.txt".format(dr, eng), J)
+
+    J = tbt.vector_current('Right', eng, only='all')
+    np.savetxt("{}/Right_{}_all.txt".format(dr, eng), J)
+    print(J[400, :]) 
 
 
 # Get X and Y coordinates
