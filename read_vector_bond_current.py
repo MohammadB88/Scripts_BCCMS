@@ -7,7 +7,8 @@ from scipy import sparse
 tbt = sisl.get_sile('MoS2_dev.TBT.nc')
 
 dr = './vec_cur'
-biass = [-1.5, -1.0, -0.5, 0.0, 0.5, 1.4] 
+biass = [-1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.4, 1.5]
+#biass = [-1.5, -1.0, -0.5, 0.0, 0.5, 1.4] 
 
 for bias in biass:
     J = tbt.vector_current('Left', bias, only='+')
