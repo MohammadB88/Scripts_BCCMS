@@ -2,25 +2,63 @@ import sisl
 import numpy as np
 from scipy import sparse
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d import Axes3D
+
+dr = 'vec_cur'
+bias = 1.40
+#energies = [-1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5]
+energies = [-1.5, -0.5, 0.0, 0.5, 1.5] 
 
 # read in the coordinates
-x, y, z = np.loadtxt('coords.txt')
-
-# read in the vector currents
-J = np.loadtxt('vect_cur_pos.txt')
+x, y, z = np.loadtxt('{}/coords.txt'.format(dr))
 
 # Create plot
-fig = plt.figure()
-ax = fig.add_subplot(111)
+fig , ax = plt.subplots(1, len(energies), figsize=(16,8), sharey=True)
+
 #ax = fig.gca(projection='3d')
+idx = 0
+for eng in energies:
+    print(idx, eng)
+    # read in the vector currents from Left to Right electrode
+    J_l_pos = np.loadtxt('{}/Left_{}_pos.txt'.format(dr, eng))
+    J_l_neg = np.loadtxt('{}/Left_{}_neg.txt'.format(dr, eng))
+    J_l_all = np.loadtxt('{}/Left_{}_all.txt'.format(dr, eng))
+    # read in the vector currents from Right to Left electrode
+    J_r_pos = np.loadtxt('{}/Right_{}_pos.txt'.format(dr, eng))
+    J_r_neg = np.loadtxt('{}/Right_{}_neg.txt'.format(dr, eng))
+    J_r_all = np.loadtxt('{}/Right_{}_all.txt'.format(dr, eng))
+    
+    print('Inputs have been read!')
+    #ax.quiver(x, y, z, J[:, 0], J[:, 1], J[:,2]);
+    
+    # plot the vector currents from Left to Right electrode
+    #ax[idx].quiver(x, z, J_l_pos[:, 0], J_l_pos[:,2], color='blue', width=0.009)#, lw=25, pivot='mid')
+    #ax[idx].quiver(x, z, J_l_neg[:, 0], J_l_neg[:,2], color='red', width=0.009)#, lw=25, pivot='mid');
+    ax[idx].quiver(x, z, J_l_all[:, 0], J_l_all[:,2], color='cyan', width=0.009)#, lw=25, pivot='mid');
+    
+    # plot the vector currents from Right to Left electrode
+    #ax[idx].quiver(x, z, J_r_pos[:, 0], J_r_pos[:,2], color='blue', width=0.009)#, lw=25, pivot='mid')
+    #ax[idx].quiver(x, z, J_r_neg[:, 0], J_r_neg[:,2], color='red', width=0.009)#, lw=25, pivot='mid');
+    ax[idx].quiver(x, z, J_r_all[:, 0], J_r_all[:,2], color='red', width=0.009)#, lw=25, pivot='mid');
+        
+    # Add atoms as points to the plots
+    ax[idx].scatter(x, z, color = 'black', s=5)
+    
+    #ax[idx].set_xlim()
+    
+    print('plots have been produced')
+    ax[idx].set_title('At Energy {} eV'.format(eng))
+    print('title is set')
+    idx += 1
+    
+    #plt.pause(10)
+    #plt.pause(0.0001)
 
+plt.suptitle('pristine device at Bias {} eV'.format(bias))
 
-#ax.quiver(x, y, z, J[:, 0], J[:, 1], J[:,2]);
-#ax.scatter(x,y,z, color = 'black')
-ax.quiver(x, z, J[:, 0], J[:,2], color='blue');
-ax.scatter(x, z, color = 'black')
-
+plt.subplots_adjust(right=1.00, wspace=0.05, hspace=0.05, bottom=0.05, top=0.4)
+plt.tight_layout()
+plt.savefig('vector_current_B1.40.png')
 plt.show()
 
 # *********************************************
