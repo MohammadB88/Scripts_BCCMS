@@ -12,7 +12,7 @@ lst_vacancies = ['pristine', 'int_LR_v_mo', 'int_LR_v_mo3s', 'int_LR_v_mo6s']
 lst_labels = ['Pristine', '$V_{Mo}$', '$V_{Mo3s}$', '$V_{Mo6s}$']
 
 # parameters for the plot
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 26), squeeze=True)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10), squeeze=True)
 
 # set the title for left and right plots
 ax1.set_title("Bias 0.00 eV", fontsize=20, loc='center', pad=-25.0)
@@ -61,7 +61,7 @@ fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol
 
 #fig.text(0.5, 0.92, 'Projected Local DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
 
-plt.subplots_adjust(right=1.00, wspace=0.00, hspace=0.0, bottom=0.0, top=0.005)
+plt.subplots_adjust(right=1.00, wspace=0.00, hspace=0.0, bottom=0.0, top=0.35)
 plt.tight_layout()
 
 
