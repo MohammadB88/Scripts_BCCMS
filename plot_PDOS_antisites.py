@@ -12,7 +12,7 @@ lst_vacancies = ['pristine', 'int_LR_v_s_with_mo', 'int_LR_v_2stop_with_mo', 'in
 lst_labels = ['Pristine', '$Mo_{S}$', '$Mo_{2S-top}$', '$S_{Mo}$', '$2S-top_{Mo}$']#, '$Mo_{split}$']
 
 # parameters for the plot
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 26), squeeze=True)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10), squeeze=True)
 
 # set the title for left and right plots
 ax1.set_title("Bias 0.00 eV", fontsize=20, loc='center', pad=-25.0)
@@ -23,7 +23,7 @@ for ax in (ax1,ax2):
     ax.set_xlim(-2.0,2.0)
     ax.set_xlabel('Energy (eV)', fontsize=20)
     ax.set_ylim(0, 100)
-    ax.set_ylabel('Projected Local DOS (Left interface)', fontsize=20) #($10^{-10}$)
+    ax.set_ylabel('Projected Local DOS (Left Interface)', fontsize=20) #($10^{-10}$)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
     ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20)
     ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
@@ -60,7 +60,7 @@ fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol
 
 #fig.text(0.5, 0.92, 'Projected Local DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
 
-plt.subplots_adjust(right=1.00, wspace=0.00, hspace=0.0, bottom=0.0, top=0.005)
+plt.subplots_adjust(right=1.00, wspace=0.00, hspace=0.0, bottom=0.0, top=0.35)
 plt.tight_layout()
 
 
