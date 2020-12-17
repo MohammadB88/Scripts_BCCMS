@@ -24,12 +24,16 @@ gs = GridSpec(nrows=2, ncols=2)
 
 ax1 = fig.add_subplot(gs[0, 0])
 ax2 = fig.add_subplot(gs[1, 0])
-
 ax3 = fig.add_subplot(gs[:, 1])
 
 # set the title for left and right plots
 ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
 ax2.set_title("V = 1.40", fontsize=20, loc='center', pad=-26.0)
+
+# set label for each figure as a), b), and c)
+ax1.text(0.05, 0.95, "(a)", transform=ax1.transAxes, ha="left", va="top", fontsize=22)
+ax2.text(0.05, 0.95, "(b)", transform=ax2.transAxes, ha="left", va="top", fontsize=22)
+ax3.text(0.90, 0.95, "(c)", transform=ax3.transAxes, ha="left", va="top", fontsize=22)
 
 # create the box for the inset plots
 ax1_insetl = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.43, 0.35), bbox_transform=ax1.transAxes, loc='lower left')
