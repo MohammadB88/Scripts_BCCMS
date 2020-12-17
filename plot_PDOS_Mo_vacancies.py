@@ -22,22 +22,22 @@ plt.xlabel('Energy (eV)', fontsize=20, labelpad=12.0)
 plt.ylabel('Projected Local DOS (Left Interface)', fontsize=20, labelpad=15.0)
 
 # set the title for left and right plots
-ax1.set_title("Bias 0.00 eV", fontsize=20, loc='center', pad=-26.0)
-ax2.set_title("Bias 1.40 eV", fontsize=20, loc='center', pad=-26.0)
+ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
+ax2.set_title("V = 1.40", fontsize=20, loc='center', pad=-26.0)
 
 # Set labels, tick labels, parameters for all plots.
 for ax in (ax1,ax2):
     ax.set_xlim(-1.0,1.5)
     #ax.set_xlabel('Energy (eV)', fontsize=20)
-    ax.set_ylim(0, 30)
+    ax.set_ylim(0, 40)
     #ax.set_ylabel('Projected Local DOS (Left Interface)', fontsize=20) #($10^{-10}$)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
-    ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20)
+    ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
     ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
-    ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14)
+    ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
     ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
     ax.yaxis.offsetText.set_fontsize(20)
-    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(10))
     #ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
     ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
