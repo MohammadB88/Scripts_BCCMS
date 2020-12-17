@@ -58,15 +58,15 @@ for ax in (ax1,ax2):
     ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
     ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
     ax.yaxis.offsetText.set_fontsize(20)
-    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
     #ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
     ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+    ax.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 # **********************  AX1 **************************
 # ******************************************************
 # parameters for the inset box and plot at the LEFT side
-x1, x2, y1, y2 = -1.0, -0.5, -0.005, 0.8
+x1, x2, y1, y2 = -1.0, -0.4, -0.005, 0.8
 ax1_insetl.set_xlim(x1, x2)
 ax1_insetl.set_ylim(y1, y2)
 ax1_insetl.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
@@ -75,10 +75,10 @@ ax1_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax1_insetl.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax1_insetl.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax1_insetl.yaxis.offsetText.set_fontsize(20)
-ax1_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+ax1_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 ax1_insetl.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 #ax1_insetl.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-#ax1_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+#ax1_insetl.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 plt.xticks(visible=False)
 plt.yticks(visible=False)
@@ -96,13 +96,13 @@ plt.yticks(visible=False)
 #ax1_insetr.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
 #ax1_insetr.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 ##ax1_insetr.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-##ax1_insetr.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+##ax1_insetr.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 
 # **********************  AX2 **************************
 # ******************************************************
 # parameters for the inset box and plot at the LEFT side
-x1, x2, y1, y2 = -1.5, -0.8, -0.005, 0.8
+x1, x2, y1, y2 = -1.5, -0.6, -0.005, 0.8
 ax2_insetl.set_xlim(x1, x2)
 ax2_insetl.set_ylim(y1, y2)
 ax2_insetl.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
@@ -111,10 +111,10 @@ ax2_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax2_insetl.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax2_insetl.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax2_insetl.yaxis.offsetText.set_fontsize(20)
-ax2_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+ax2_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 ax2_insetl.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 #ax2_insetl.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-#ax2_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+#ax2_insetl.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 plt.xticks(visible=False)
 plt.yticks(visible=False)
@@ -132,13 +132,13 @@ plt.yticks(visible=False)
 #ax2_insetr.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
 #ax2_insetr.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 ##ax2_insetr.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-##ax2_insetr.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+##ax2_insetr.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 
 # **********************  AX3 **************************
 # ******************************************************
 # parameters for the inset box and plot
-x1, x2, y1, y2 = 0.6, 1.5, -0.05, 1.00
+x1, x2, y1, y2 = 0.6, 1.5, -0.005, 1.00
 ax3_inset.set_xlim(x1, x2)
 ax3_inset.set_ylim(y1, y2)
 ax3_inset.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
@@ -147,10 +147,10 @@ ax3_inset.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax3_inset.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax3_inset.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax3_inset.yaxis.offsetText.set_fontsize(20)
-ax3_inset.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+ax3_inset.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 ax3_inset.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 #ax3_inset.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
-#ax3_inset.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+#ax3_inset.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 # read in and plot the pdos for TS_0.00
 for vacancy,label in zip(lst_vacancies, lst_labels):
@@ -214,10 +214,10 @@ ax3.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax3.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax3.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax3.yaxis.offsetText.set_fontsize(20)
-ax3.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+ax3.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 #ax3.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
-ax3.yaxis.set_minor_locator(ticker.MultipleLocator(0.5*(1e-1))) # *(1e-(10-set_fontsize9)) since Current is in nanoAmper
-ax3.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', bottom=True, top=True)
+ax3.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))#*(1e-1))) # *(1e-(10-set_fontsize9)) since Current is in nanoAmper
+ax3.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 ax3.legend(fontsize=23, loc='upper left')
 
 handles, labels = ax1.get_legend_handles_labels()
@@ -229,6 +229,6 @@ fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol
 plt.tight_layout(rect=(0.0,0.0,1.00,0.95))
 #plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
-plt.savefig('transmission_Mo_vacancies.png')
+plt.savefig('transmission_IV_Mo_vacancies.png')
 
 plt.show()
