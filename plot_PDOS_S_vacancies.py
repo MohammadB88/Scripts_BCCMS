@@ -22,8 +22,8 @@ plt.xlabel('Energy (eV)', fontsize=20, labelpad=12.0)
 plt.ylabel('Projected Local DOS (Left Interface)', fontsize=20, labelpad=15.0)
 
 # set the title for left and right plots
-ax1.set_title("Bias 0.00 eV", fontsize=20, loc='center', pad=-26.0)
-ax2.set_title("Bias 1.40 eV", fontsize=20, loc='center', pad=-26.0)
+ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
+ax2.set_title("V = 1.40", fontsize=20, loc='center', pad=-26.0)
 
 # Set labels, tick labels, parameters for all plots.
 for ax in (ax1,ax2):
