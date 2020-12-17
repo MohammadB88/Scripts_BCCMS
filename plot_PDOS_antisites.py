@@ -12,27 +12,34 @@ lst_vacancies = ['pristine', 'int_LR_v_s_with_mo', 'int_LR_v_2stop_with_mo', 'in
 lst_labels = ['Pristine', '$Mo_{S}$', '$Mo_{2S-top}$', '$S_{Mo}$', '$2S-top_{Mo}$']#, '$Mo_{split}$']
 
 # parameters for the plot
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10), squeeze=True)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), sharex=True, squeeze=True)
+
+# add a big axis, hide frame
+fig.add_subplot(111, frameon=False)
+# hide tick and tick label of the big axis
+plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+plt.xlabel('Energy (eV)', fontsize=20, labelpad=12.0)
+plt.ylabel('Projected Local DOS (Left Interface)', fontsize=20, labelpad=15.0)
 
 # set the title for left and right plots
-ax1.set_title("Bias 0.00 eV", fontsize=20, loc='center', pad=-25.0)
-ax2.set_title("Bias 1.40 eV", fontsize=20, loc='center', pad=-25.0)
+ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
+ax2.set_title("V = 1.40", fontsize=20, loc='center', pad=-26.0)
 
 # Set labels, tick labels, parameters for all plots.
 for ax in (ax1,ax2):
-    ax.set_xlim(-2.0,2.0)
-    ax.set_xlabel('Energy (eV)', fontsize=20)
-    ax.set_ylim(0, 100)
-    ax.set_ylabel('Projected Local DOS (Left Interface)', fontsize=20) #($10^{-10}$)
+    ax.set_xlim(-1.0,1.5)
+    #ax.set_xlabel('Energy (eV)', fontsize=20)
+    ax.set_ylim(0, 40)
+    #ax.set_ylabel('Projected Local DOS (Left Interface)', fontsize=20) #($10^{-10}$)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
-    ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20)
+    ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
     ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
-    ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14)
+    ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
     ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
     ax.yaxis.offsetText.set_fontsize(20)
-    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
-    #ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
-    ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(10))
+    #ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
     ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
 
 # read in and plot the pdos for TS_0.00
@@ -60,9 +67,8 @@ fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol
 
 #fig.text(0.5, 0.92, 'Projected Local DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
 
-plt.subplots_adjust(right=1.00, wspace=0.00, hspace=0.0, bottom=0.0, top=0.35)
-plt.tight_layout()
-
+plt.tight_layout(rect=(-0.04,-0.04,1.015,0.94))
+#plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
 plt.savefig('PLDOS_antisites.png')
 
