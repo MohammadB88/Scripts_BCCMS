@@ -20,7 +20,8 @@ fig.add_subplot(111, frameon=False)
 # hide tick and tick label of the big axis
 plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
 plt.xlabel('Energy (eV)', fontsize=20, labelpad=12.0)
-plt.ylabel('Projected Local DOS (Left Interface)', fontsize=20, labelpad=15.0)
+#plt.ylabel('Projected Local DOS (Left Interface)', fontsize=20, labelpad=15.0)
+plt.ylabel('LDOS', fontsize=20, labelpad=15.0)
 
 # set the title for left and right plots
 ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
@@ -50,16 +51,17 @@ for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     #print('PRINT',glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[0],layer[0])))
     f_l = np.loadtxt(glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[0],layer[0]))[0], unpack=True)
     print(f_shift)
-    #ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
+    ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    
 
 # read in and plot the pdos for TS_1.40
 for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     #print(vacancy, label)
     #print('PRINT',glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[1],layer[0])))
     f_l = np.loadtxt(glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[1],layer[0]))[0], unpack=True)
-    #ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
+    ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
 
 # Hide x labels and tick labels for top plots and y ticks for right plots.
 for ax in (ax1,ax2):
@@ -76,6 +78,7 @@ plt.tight_layout(rect=(-0.03,-0.04,1.015,0.925))
 #plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
 
-plt.savefig('PLDOS_S_vacancies.png')
+#plt.savefig('PLDOS_S_vacancies.png')
+plt.savefig('PLDOS_S_vacancies_shift.png')
 
 plt.show()
