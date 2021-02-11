@@ -16,6 +16,7 @@ direc = ['TS_0.00/', 'TS_1.40/']
 lst_vacancies = ['pristine', 'int_LR_v_s', 'int_LR_v_2stop', 'int_LR_v_2spar']
 lst_vacancies_IV = ['pristine', 's_both_int', '2stop_both_int', '2spar_both_int']
 lst_labels = ['Pristine', '$V_{S}$', '$V_{2S-top}$', '$V_{2S-par}$']
+fermi_shifts = [00.0000000000, 0.005007000000000428, 0.0030080000000003437, -0.005323999999999884]
 
 # parameters for the plot
 #fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 18), sharex=True, squeeze=True)
@@ -39,7 +40,7 @@ ax3.text(0.90, 0.95, "(c)", transform=ax3.transAxes, ha="left", va="top", fontsi
 ax1_insetl = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.43, 0.35), bbox_transform=ax1.transAxes, loc='lower left')
 #ax1_insetr = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.70, 0.55), bbox_transform=ax1.transAxes, loc='lower left')
 
-ax2_insetl = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.43, 0.32), bbox_transform=ax2.transAxes, loc='lower left')
+ax2_insetl = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.43, 0.35), bbox_transform=ax2.transAxes, loc='lower left')
 #ax2_insetr = zoomed_inset_axes(ax2, 2, bbox_to_anchor=(1.70, 0.55), bbox_transform=ax2.transAxes, loc='lower left')
 
 # create the box for the inset plots
@@ -65,22 +66,22 @@ for ax in (ax1,ax2):
 # **********************  AX1 **************************
 # ******************************************************
 # parameters for the inset box and plot at the LEFT side
-x1, x2, y1, y2 = -1.0, -0.5, -0.005, 0.8
+x1, x2, y1, y2 = -1.0, -0.4, -0.005, 0.8
 ax1_insetl.set_xlim(x1, x2)
 ax1_insetl.set_ylim(y1, y2)
 ax1_insetl.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
-ax1_insetl.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
+ax1_insetl.tick_params(axis='x', which='major', labelbottom=False, width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
 ax1_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax1_insetl.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax1_insetl.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax1_insetl.yaxis.offsetText.set_fontsize(20)
-ax1_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
+ax1_insetl.tick_params(axis='y', which='major', labelleft=False, width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 ax1_insetl.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 #ax1_insetl.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
 #ax1_insetl.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
-plt.xticks(visible=False)
-plt.yticks(visible=False)
+#plt.xticks(visible=False)
+#plt.yticks(visible=False)
 
 ## parameters for the inset box and plot at the RIGHT side
 #x1, x2, y1, y2 = 1.0, 1.4, -0.005, 0.5
@@ -101,22 +102,22 @@ plt.yticks(visible=False)
 # **********************  AX2 **************************
 # ******************************************************
 # parameters for the inset box and plot at the LEFT side
-x1, x2, y1, y2 = -1.5, -0.8, -0.005, 0.8
+x1, x2, y1, y2 = -1.4, -0.8, -0.005, 0.8
 ax2_insetl.set_xlim(x1, x2)
 ax2_insetl.set_ylim(y1, y2)
 ax2_insetl.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
-ax2_insetl.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
+ax2_insetl.tick_params(axis='x', which='major', labelbottom=False, width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
 ax2_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax2_insetl.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax2_insetl.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax2_insetl.yaxis.offsetText.set_fontsize(20)
-ax2_insetl.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
+ax2_insetl.tick_params(axis='y', which='major', labelleft=False, width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 ax2_insetl.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 #ax2_insetl.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
 #ax2_insetl.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
-plt.xticks(visible=False)
-plt.yticks(visible=False)
+#plt.xticks(visible=False)
+#plt.yticks(visible=False)
 
 ## parameters for the inset box and plot at the RIGHT side
 #x1, x2, y1, y2 = 1.4, 1.9, -0.005, 0.5
@@ -141,23 +142,26 @@ x1, x2, y1, y2 = 0.8, 1.5, -0.001, 0.05
 ax3_inset.set_xlim(x1, x2)
 ax3_inset.set_ylim(y1, y2)
 ax3_inset.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
-ax3_inset.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
+ax3_inset.tick_params(axis='x', which='major', labelbottom=False, width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
 ax3_inset.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 ax3_inset.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax3_inset.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax3_inset.yaxis.offsetText.set_fontsize(20)
-ax3_inset.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
+ax3_inset.tick_params(axis='y', which='major', labelleft=False, width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
 ax3_inset.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 #ax3_inset.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
 #ax3_inset.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 # read in and plot the pdos for TS_0.00
-for vacancy,label in zip(lst_vacancies, lst_labels):
+for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]), unpack=True)
-    ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
+    print(f_shift)
+    ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    #ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
     
     # plot the inset image
-    ax1_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
+    ax1_insetl.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    #ax1_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
     #ax1_insetr.plot(f_l[0], f_l[1], label='{}'.format(label))
     
     # draw a bbox of the region of the inset axes in the parent axes and
@@ -167,12 +171,14 @@ for vacancy,label in zip(lst_vacancies, lst_labels):
 
 
 # read in and plot the pdos for TS_1.40
-for vacancy,label in zip(lst_vacancies, lst_labels):
+for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]), unpack=True)
-    ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
+    ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    #ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
 
     # plot the inset image
-    ax2_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
+    ax2_insetl.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    #ax2_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
     #ax2_insetr.plot(f_l[0], f_l[1], label='{}'.format(label))
     
     # draw a bbox of the region of the inset axes in the parent axes and
@@ -219,15 +225,16 @@ ax3.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, d
 ax3.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 ax3.legend(fontsize=23, loc='upper left')
 
-handles, labels = ax1.get_legend_handles_labels()
+#handles, labels = ax1.get_legend_handles_labels()
 
-fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol=4, fancybox=True, shadow=True, fontsize=20)
+#fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol=4, fancybox=True, shadow=True, fontsize=20)
 
 #fig.text(0.5, 0.92, 'Projected DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
 
-plt.tight_layout(rect=(0.0,0.0,1.00,0.95))
+plt.tight_layout(rect=(0.0,0.0,1.00,1.00))
 #plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
-plt.savefig('transmission_IV_S_vacancies.png')
+#plt.savefig('transmission_IV_S_vacancies.png')
+plt.savefig('transmission_IV_S_vacancies_shift.png')
 
 plt.show()
