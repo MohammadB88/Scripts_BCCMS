@@ -10,9 +10,10 @@ direc = ['TS_0.00/', 'TS_1.40/']
 layer = [2]
 lst_vacancies = ['pristine', 'int_LR_v_s', 'int_LR_v_2stop', 'int_LR_v_2spar']
 lst_labels = ['Pristine', '$V_{S}$', '$V_{2S-top}$', '$V_{2S-par}$']
+fermi_shifts = [00.0000000000, 0.005007000000000428, 0.0030080000000003437, -0.005323999999999884]
 
 # parameters for the plot
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), sharex=True, squeeze=True)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7), sharex=True, squeeze=True)
 
 # add a big axis, hide frame
 fig.add_subplot(111, frameon=False)
@@ -40,21 +41,24 @@ for ax in (ax1,ax2):
     ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(10))
     #ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
-    ax.tick_params(axis='y', which='major', width=2.00, length=5.0, labelsize=22)
+    ax.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 
 
 # read in and plot the pdos for TS_0.00
-for vacancy,label in zip(lst_vacancies,lst_labels):
+for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     #print(vacancy, label)
     #print('PRINT',glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[0],layer[0])))
     f_l = np.loadtxt(glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[0],layer[0]))[0], unpack=True)
+    print(f_shift)
+    #ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
     ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
 
 # read in and plot the pdos for TS_1.40
-for vacancy,label in zip(lst_vacancies,lst_labels):
+for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     #print(vacancy, label)
     #print('PRINT',glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[1],layer[0])))
     f_l = np.loadtxt(glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[1],layer[0]))[0], unpack=True)
+    #ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
     ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
 
 # Hide x labels and tick labels for top plots and y ticks for right plots.
@@ -64,11 +68,11 @@ for ax in (ax1,ax2):
 
 handles, labels = ax1.get_legend_handles_labels()
 
-fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol=4, fancybox=True, shadow=True, fontsize=20)
+fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.01), ncol=4, fancybox=True, shadow=True, fontsize=20)
 
 #fig.text(0.5, 0.92, 'Projected Local DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
 
-plt.tight_layout(rect=(-0.04,-0.04,1.015,0.94))
+plt.tight_layout(rect=(-0.03,-0.04,1.015,0.925))
 #plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
 
