@@ -24,8 +24,8 @@ plt.xlabel('$E$ - $E_{F}$ (eV)', fontsize=20, labelpad=12.0)
 plt.ylabel('LDOS (arb. units)', fontsize=20, labelpad=15.0)
 
 # set the title for left and right plots
-ax1.set_title("V = 0.00", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
-ax2.set_title("V = 1.40", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
+ax1.set_title("Bias = 0.00 V", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
+ax2.set_title("Bias = 1.40 V", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
 
 # Set labels, tick labels, parameters for all plots.
 for ax in (ax1,ax2):
