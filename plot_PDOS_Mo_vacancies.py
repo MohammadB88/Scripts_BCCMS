@@ -9,7 +9,7 @@ direc = ['TS_0.00/', 'TS_1.40/']
 
 layer = [2]
 lst_vacancies = ['pristine', 'int_LR_v_mo', 'int_LR_v_mo3s', 'int_LR_v_mo6s']
-lst_labels = ['Pristine', '$V_{Mo}$', '$V_{Mo3s}$', '$V_{Mo6s}$']
+lst_labels = ['Perfect Int', '$V_{Mo}$', '$V_{Mo3s}$', '$V_{Mo6s}$']
 fermi_shifts = [00.0000000000, -0.009075999999999862, 0.0009380000000001054, -0.024042999999999815]
 
 # parameters for the plot
