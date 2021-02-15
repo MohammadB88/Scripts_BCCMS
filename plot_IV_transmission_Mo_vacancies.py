@@ -15,7 +15,7 @@ direc = ['TS_0.00/', 'TS_1.40/']
 #layer = [2]
 lst_vacancies = ['pristine', 'int_LR_v_mo', 'int_LR_v_mo3s', 'int_LR_v_mo6s']
 lst_vacancies_IV = ['pristine', 'mo_both_int', 'mo3s_both_int', 'mo6s_both_int']
-lst_labels = ['Pristine', '$V_{Mo}$', '$V_{Mo3s}$', '$V_{Mo6s}$']
+lst_labels = ['Perfect Int', '$V_{Mo}$', '$V_{Mo3s}$', '$V_{Mo6s}$']
 fermi_shifts = [00.0000000000, -0.009075999999999862, 0.0009380000000001054, -0.024042999999999815]
 
 # parameters for the plot
@@ -29,19 +29,19 @@ ax2 = fig.add_subplot(gs[1, 0])
 ax3 = fig.add_subplot(gs[:, 1])
 
 # set the title for left and right plots
-ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
-ax2.set_title("V = 1.40", fontsize=20, loc='center', pad=-26.0)
+ax1.set_title("Bias = 0.00 V", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
+ax2.set_title("Bias = 1.40 V", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
 
 # set label for each figure as a), b), and c)
-ax1.text(0.05, 0.95, "(a)", transform=ax1.transAxes, ha="left", va="top", fontsize=22)
-ax2.text(0.05, 0.95, "(b)", transform=ax2.transAxes, ha="left", va="top", fontsize=22)
-ax3.text(0.90, 0.95, "(c)", transform=ax3.transAxes, ha="left", va="top", fontsize=22)
+ax1.text(0.05, 0.95, "(a)", transform=ax1.transAxes, ha="left", va="top", fontsize=22, fontweight="bold")
+ax2.text(0.05, 0.95, "(b)", transform=ax2.transAxes, ha="left", va="top", fontsize=22, fontweight="bold")
+ax3.text(0.90, 0.95, "(c)", transform=ax3.transAxes, ha="left", va="top", fontsize=22, fontweight="bold")
 
 # create the box for the inset plots
-ax1_insetl = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.43, 0.35), bbox_transform=ax1.transAxes, loc='lower left')
+ax1_insetl = zoomed_inset_axes(ax1, 2.4, bbox_to_anchor=(0.43, 0.20), bbox_transform=ax1.transAxes, loc='lower left')
 #ax1_insetr = zoomed_inset_axes(ax1, 2, bbox_to_anchor=(0.70, 0.55), bbox_transform=ax1.transAxes, loc='lower left')
 
-ax2_insetl = zoomed_inset_axes(ax2, 2, bbox_to_anchor=(0.43, 0.35), bbox_transform=ax2.transAxes, loc='lower left')
+ax2_insetl = zoomed_inset_axes(ax2, 2.4, bbox_to_anchor=(0.43, 0.20), bbox_transform=ax2.transAxes, loc='lower left')
 #ax2_insetr = zoomed_inset_axes(ax2, 2, bbox_to_anchor=(1.70, 0.55), bbox_transform=ax2.transAxes, loc='lower left')
 
 # create the box for the inset plots
@@ -50,12 +50,12 @@ ax3_inset = zoomed_inset_axes(ax3, 1.5, bbox_to_anchor=(0.04, 0.35), bbox_transf
 # Set labels, tick labels, parameters for all plots.
 for ax in (ax1,ax2):
     ax.set_xlim(-2.0,2.0)
-    ax.set_xlabel('Energy (eV)', fontsize=20)
+    ax.set_xlabel('$E$ - $E_{F}$ (eV)', fontsize=20, labelpad=12.0)
     ax.set_ylim(0, 3.5)
     ax.set_ylabel('Transmission', fontsize=20) #($10^{-10}$)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
     ax.tick_params(axis='x', which='major', width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
-    ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
+    ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.25))
     ax.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
     ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
     ax.yaxis.offsetText.set_fontsize(20)
@@ -63,16 +63,22 @@ for ax in (ax1,ax2):
     #ax.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
     ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
     ax.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
+    
+    # make spines (Frames) thicker
+    ax.spines["top"].set_linewidth(2)
+    ax.spines["bottom"].set_linewidth(2)
+    ax.spines["left"].set_linewidth(2)
+    ax.spines["right"].set_linewidth(2)
 
 # **********************  AX1 **************************
 # ******************************************************
 # parameters for the inset box and plot at the LEFT side
-x1, x2, y1, y2 = -1.0, -0.3, -0.005, 0.8
+x1, x2, y1, y2 = -0.9, -0.3, -0.005, 0.8
 ax1_insetl.set_xlim(x1, x2)
 ax1_insetl.set_ylim(y1, y2)
 ax1_insetl.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
 ax1_insetl.tick_params(axis='x', which='major', labelbottom=False, width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
-ax1_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
+ax1_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.25))
 ax1_insetl.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax1_insetl.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax1_insetl.yaxis.offsetText.set_fontsize(20)
@@ -103,12 +109,12 @@ ax1_insetl.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 # **********************  AX2 **************************
 # ******************************************************
 # parameters for the inset box and plot at the LEFT side
-x1, x2, y1, y2 = -1.3, -0.6, -0.005, 0.8
+x1, x2, y1, y2 = -1.2, -0.6, -0.005, 0.8
 ax2_insetl.set_xlim(x1, x2)
 ax2_insetl.set_ylim(y1, y2)
 ax2_insetl.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
 ax2_insetl.tick_params(axis='x', which='major', labelbottom=False, width=2.00, length=5.0, labelsize=20, direction='in', bottom=True, top=True)
-ax2_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.1))
+ax2_insetl.xaxis.set_minor_locator(ticker.MultipleLocator(0.25))
 ax2_insetl.tick_params(axis='x', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', bottom=True, top=True)
 ax2_insetl.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
 ax2_insetl.yaxis.offsetText.set_fontsize(20)
@@ -156,13 +162,13 @@ ax3_inset.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
 # read in and plot the pdos for TS_0.00
 for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[0]), unpack=True)
-    print(f_shift)
-    ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    #ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #print(f_shift)
+    #ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
     
     # plot the inset image
-    ax1_insetl.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    #ax1_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #ax1_insetl.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    ax1_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
     #ax1_insetr.plot(f_l[0], f_l[1], label='{}'.format(label))
     
     # draw a bbox of the region of the inset axes in the parent axes and
@@ -174,12 +180,12 @@ for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
 # read in and plot the pdos for TS_1.40
 for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     f_l = np.loadtxt('{}/{}MoS2_dev.TBT.AVTRANS_Left-Right'.format(vacancy,direc[1]), unpack=True)
-    ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    #ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
 
     # plot the inset image
-    ax2_insetl.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    #ax2_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #ax2_insetl.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    ax2_insetl.plot(f_l[0], f_l[1], label='{}'.format(label))
     #ax2_insetr.plot(f_l[0], f_l[1], label='{}'.format(label))
     
     # draw a bbox of the region of the inset axes in the parent axes and
@@ -196,7 +202,7 @@ for ax in (ax1,ax2):
 # parameters for the plot of IV
 # **********************************
 ax3.set_xlim(0.0, 1.5)
-ax3.set_xlabel('Voltage', fontsize=20)
+ax3.set_xlabel('Bias Voltage (V)', fontsize=20)
 ax3.set_ylim(0.0, 8.5) # *(1e-(10-9)) since Current is in nanoAmper
 ax3.set_ylabel('Current (nA)', fontsize=20) #($10^{-10}$)
 
@@ -226,6 +232,12 @@ ax3.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))#*(1e-1))) # *(1e-(10-se
 ax3.tick_params(axis='y', which='minor', width=1.00, length=3.5, labelsize=14, direction='in', left=True, right=True)
 ax3.legend(fontsize=23, loc='upper left')
 
+# make spines (Frames) thicker
+ax3.spines["top"].set_linewidth(2)
+ax3.spines["bottom"].set_linewidth(2)
+ax3.spines["left"].set_linewidth(2)
+ax3.spines["right"].set_linewidth(2)
+
 #handles, labels = ax1.get_legend_handles_labels()
 
 #fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.00), ncol=4, fancybox=True, shadow=True, fontsize=20)
@@ -235,7 +247,7 @@ ax3.legend(fontsize=23, loc='upper left')
 plt.tight_layout(rect=(0.0,0.0,1.00,1.00))
 #plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
-#plt.savefig('transmission_IV_Mo_vacancies.png')
-plt.savefig('transmission_IV_Mo_vacancies_shift.png')
+plt.savefig('transmission_IV_Mo_vacancies.png')
+#plt.savefig('transmission_IV_Mo_vacancies_shift.png')
 
 plt.show()
