@@ -9,7 +9,7 @@ direc = ['TS_0.00/', 'TS_1.40/']
 
 layer = [2]
 lst_vacancies = ['pristine', 'int_LR_v_s_with_mo', 'int_LR_v_2stop_with_mo', 'int_LR_v_mo_with_s', 'int_LR_v_mo_with_2stop']#, 'int_LR_v_mo_split']
-lst_labels = ['Pristine', '$Mo_{S}$', '$Mo_{2S-top}$', '$S_{Mo}$', '$2S-top_{Mo}$']#, '$Mo_{split}$']
+lst_labels = ['Perfect Int', '$Mo_{S}$', '$Mo_{2S-top}$', '$S_{Mo}$', '$2S-top_{Mo}$']#, '$Mo_{split}$']
 fermi_shifts = [00.0000000000, 0.024425000000000363, 0.013571000000000222, 0.02543500000000032, 0.009647000000000183]
 
 # parameters for the plot
@@ -19,13 +19,13 @@ fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7), sharex=True, squeeze=True)
 fig.add_subplot(111, frameon=False)
 # hide tick and tick label of the big axis
 plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
-plt.xlabel('Energy (eV)', fontsize=20, labelpad=12.0)
+plt.xlabel('$E$ - $E_{F}$ (eV)', fontsize=20, labelpad=12.0)
 #plt.ylabel('Projected Local DOS (Left Interface)', fontsize=20, labelpad=15.0)
-plt.ylabel('LDOS', fontsize=20, labelpad=15.0)
+plt.ylabel('LDOS (arb. units)', fontsize=20, labelpad=15.0)
 
 # set the title for left and right plots
-ax1.set_title("V = 0.00", fontsize=20, loc='center', pad=-26.0)
-ax2.set_title("V = 1.40", fontsize=20, loc='center', pad=-26.0)
+ax1.set_title("V = 0.00", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
+ax2.set_title("V = 1.40", fontsize=19, loc='center', pad=-26.0, fontweight="bold")
 
 # Set labels, tick labels, parameters for all plots.
 for ax in (ax1,ax2):
@@ -43,23 +43,29 @@ for ax in (ax1,ax2):
     ax.yaxis.set_major_locator(ticker.MultipleLocator(10))
     #ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
     ax.tick_params(axis='y', which='minor', width=2.00, length=5.0, labelsize=22, direction='in', left=True, right=True)
+    
+    # make spines (Frames) thicker
+    ax.spines["top"].set_linewidth(2)
+    ax.spines["bottom"].set_linewidth(2)
+    ax.spines["left"].set_linewidth(2)
+    ax.spines["right"].set_linewidth(2)
 
 # read in and plot the pdos for TS_0.00
 for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     #print(vacancy, label)
     #print('PRINT',glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[0],layer[0])))
     f_l = np.loadtxt(glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[0],layer[0]))[0], unpack=True)
-    print(f_shift)
-    ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    #ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #print(f_shift)
+    #ax1.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    ax1.plot(f_l[0], f_l[1], label='{}'.format(label))
 
 # read in and plot the pdos for TS_1.40
 for vacancy, label, f_shift in zip(lst_vacancies, lst_labels, fermi_shifts):
     #print(vacancy, label)
     #print('PRINT',glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[1],layer[0])))
     f_l = np.loadtxt(glob.glob('{}/{}dos_Left_int_{}L_*.dat'.format(vacancy,direc[1],layer[0]))[0], unpack=True)
-    ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
-    #ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
+    #ax2.plot(f_l[0] + f_shift, f_l[1], label='{}'.format(label))
+    ax2.plot(f_l[0], f_l[1], label='{}'.format(label))
 
 # Hide x labels and tick labels for top plots and y ticks for right plots.
 for ax in (ax1,ax2):
@@ -72,11 +78,11 @@ fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.51, 1.01), nco
 
 #fig.text(0.5, 0.92, 'Projected Local DOS onto the layers at the left interface', fontsize=20, horizontalalignment='center', verticalalignment='top')
 
-plt.tight_layout(rect=(-0.04,-0.00,1.015,0.925))
+plt.tight_layout(rect=(-0.04,-0.05,1.015,0.925))
 #plt.subplots_adjust(left=0.01, right=0.02, wspace=0.00, hspace=0.0, bottom=0.0,top=0.35)
 
-#plt.savefig('PLDOS_antisites.png')
-plt.savefig('PLDOS_antisites_shift.png')
+plt.savefig('PLDOS_antisites.png')
+#plt.savefig('PLDOS_antisites_shift.png')
 
 
-plt.show()
+#plt.show()
